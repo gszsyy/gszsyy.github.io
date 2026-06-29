@@ -5,6 +5,7 @@
   var PASSWORD = "gszsyy1234";
   var AUTH_KEY = "duomianma-sdk-weekly-auth";
   var DRAFT_KEY = "duomianma-sdk-weekly-draft-v1";
+  var PROJECTS_KEY = "duomianma-sdk-projects-v1";
   var scriptLoads = {};
 
   var loginScreen = document.getElementById("login-screen");
@@ -12,6 +13,11 @@
   var loginForm = document.getElementById("login-form");
   var loginButton = document.getElementById("login-button") || (loginForm && loginForm.querySelector("button[type=submit]"));
   var loginError = document.getElementById("login-error");
+  var cards = document.getElementById("cards");
+  var newProjectPage = document.getElementById("new-project-page");
+  var projectForm = document.getElementById("project-form");
+  var projectCount = document.getElementById("project-count");
+  var entryCount = document.getElementById("entry-count");
 
   var fields = {
     title: document.getElementById("report-title"),
@@ -65,6 +71,107 @@
       risks: fieldValue("risks"),
       next: fieldValue("next")
     };
+  }
+
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function nowLabel() {
+    var date = new Date();
+    var pad = function (value) { return String(value).padStart(2, "0"); };
+    return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate()) +
+      " " + pad(date.getHours()) + ":" + pad(date.getMinutes());
+  }
+
+  function loadProjects() {
+    try {
+      var raw = localStorage.getItem(PROJECTS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (error) {
+      console.warn("project load failed", error);
+      return [];
+    }
+  }
+
+  function saveProjects(projects) {
+    localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+  }
+
+  function starMarkup(score) {
+    var html = "";
+    for (var index = 0; index < 5; index += 1) {
+      var off = (index + 1) * 20 > score ? "off" : "";
+      html += '<img class="' + off + '" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">';
+    }
+    return html;
+  }
+
+  function projectCard(project) {
+    var score = Math.max(0, Math.min(100, Number(project.completeness) || 0));
+    var owner = project.owner || "未填写";
+    var intro = project.intro || "暂无简介。";
+    return [
+      '<a class="report ac-reveal" data-cursor-label="View" href="#project-' + escapeHtml(project.id) + '" id="project-' + escapeHtml(project.id) + '">',
+      '<img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">',
+      '<div class="label">EDEN ACADEMY · REPORT CARD</div>',
+      '<h3>' + escapeHtml(project.name) + '</h3>',
+      '<div class="owner">负责人 ' + escapeHtml(owner) + ' · 更新 ' + escapeHtml(project.updatedAt) + '</div>',
+      '<p class="intro">' + escapeHtml(intro).slice(0, 90) + '</p>',
+      '<div class="stella">' + starMarkup(score) + '<span class="grade">' + score + '%</span></div>',
+      '<div class="foot"><span>📒 ' + (Number(project.entries) || 0) + ' 份联合开发进度</span><span>AI 评估完成度</span></div>',
+      '</a>'
+    ].join("");
+  }
+
+  function emptyState() {
+    return '<div class="empty"><b>还没有在册项目。</b>点「+ 新建项目 ★」创建 GitHub Pages 独立项目。</div>';
+  }
+
+  function renderProjects() {
+    if (!cards) return;
+    var projects = loadProjects();
+    cards.innerHTML = projects.length ? projects.map(projectCard).join("") : emptyState();
+    if (projectCount) {
+      projectCount.textContent = String(projects.length);
+      projectCount.setAttribute("data-count", String(projects.length));
+    }
+    if (entryCount) {
+      var entries = projects.reduce(function (total, project) {
+        return total + (Number(project.entries) || 0);
+      }, 0);
+      entryCount.textContent = String(entries);
+      entryCount.setAttribute("data-count", String(entries));
+    }
+  }
+
+  function showProjectForm() {
+    if (newProjectPage) {
+      newProjectPage.hidden = false;
+      newProjectPage.classList.remove("is-hidden");
+    }
+    if (cards) cards.classList.add("is-hidden");
+  }
+
+  function showProjectList() {
+    if (newProjectPage) {
+      newProjectPage.hidden = true;
+      newProjectPage.classList.add("is-hidden");
+    }
+    if (cards) cards.classList.remove("is-hidden");
+  }
+
+  function syncRoute() {
+    if (location.hash === "#new") {
+      showProjectForm();
+    } else {
+      showProjectList();
+    }
   }
 
   function saveDraft() {
@@ -128,6 +235,8 @@
     }
     loadDraft();
     updatePreview();
+    renderProjects();
+    syncRoute();
   }
 
   function showLogin() {
@@ -190,6 +299,36 @@
     sessionStorage.removeItem(AUTH_KEY);
     showLogin();
   });
+
+  if (projectForm) {
+    projectForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var nameInput = document.getElementById("project-name");
+      var ownerInput = document.getElementById("project-owner");
+      var introInput = document.getElementById("project-intro");
+      var completenessInput = document.getElementById("project-completeness");
+      var name = nameInput.value.trim();
+      if (!name) return;
+      var projects = loadProjects();
+      projects.unshift({
+        id: Date.now().toString(36),
+        name: name,
+        owner: ownerInput.value.trim(),
+        intro: introInput.value.trim(),
+        completeness: Math.max(0, Math.min(100, Number(completenessInput.value) || 0)),
+        entries: 0,
+        updatedAt: nowLabel()
+      });
+      saveProjects(projects);
+      projectForm.reset();
+      if (completenessInput) completenessInput.value = "0";
+      renderProjects();
+      location.hash = "#cards";
+      syncRoute();
+    });
+  }
+
+  window.addEventListener("hashchange", syncRoute);
 
   var downloadPdfButton = document.getElementById("download-pdf");
   if (downloadPdfButton) downloadPdfButton.addEventListener("click", async function () {

@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/static/theme/anya-core.css">
   <style>
     body{margin:0;background:#efe2c4;color:var(--ink);font-family:var(--display);overflow-x:hidden}
-    button,input{font:inherit}
+    button,input,textarea{font:inherit}
     .is-hidden{display:none!important}
     .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(rgba(120,90,40,.07) 1.3px,transparent 1.4px) 0 0/15px 15px,linear-gradient(180deg,#f3e8cd,#e6d6b2)}
     .v2nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;gap:18px;padding:16px 24px;color:#3a2d16;transition:background .25s,backdrop-filter .25s}
@@ -42,6 +42,18 @@
     .empty{grid-column:1/-1;text-align:center;font-family:var(--hand);color:var(--muted);padding:42px;background:#fffdf3;border:2px solid var(--gold);border-radius:14px;box-shadow:0 14px 32px rgba(90,70,30,.18);position:relative}
     .empty:before{content:"";position:absolute;inset:6px;border:1px dashed rgba(201,162,74,.6);border-radius:9px;pointer-events:none}
     .empty b{display:block;font-family:var(--display-bold);color:var(--green-deep);font-size:24px;margin-bottom:8px}
+    .project-form-section{max-width:860px;margin:0 auto 70px;padding:0 clamp(16px,4vw,40px)}
+    .project-form-card{background:#fffdf3;border:2px solid var(--gold);border-radius:14px;padding:28px 26px;box-shadow:0 14px 32px rgba(90,70,30,.18);position:relative}
+    .project-form-card:before{content:"";position:absolute;inset:7px;border:1px dashed rgba(201,162,74,.65);border-radius:9px;pointer-events:none}
+    .project-form-card>*{position:relative}
+    .project-form-card h2{font-family:var(--display-bold);color:var(--green-deep);font-size:28px;margin:0 0 18px}
+    .project-form{display:grid;gap:16px}
+    .project-form label{display:grid;gap:7px;font-family:var(--display-bold);color:#3a2d16}
+    .project-form input,.project-form textarea{width:100%;box-sizing:border-box;border:2px solid rgba(201,162,74,.7);border-radius:8px;background:#fff7bd;color:#172033;padding:12px 13px}
+    .project-form textarea{min-height:120px;line-height:1.55;resize:vertical}
+    .form-row{display:grid;grid-template-columns:1fr 180px;gap:14px}
+    .form-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+    .form-actions button,.form-actions a{border:0;cursor:pointer}
     .v2foot{background:#3a2d16;color:rgba(243,232,205,.82);padding:46px clamp(24px,7vw,90px);font-family:var(--hand);border-top:2px dashed var(--gold);position:relative;z-index:2}
     .v2foot b{color:var(--gold);font-family:var(--display-bold)}
     .pj-extra{position:relative;z-index:2;padding:10px 0 90px}
@@ -61,7 +73,7 @@
     .login-form input{width:100%;box-sizing:border-box;border:2px solid rgba(201,162,74,.7);border-radius:8px;background:#fff7bd;color:#172033;padding:13px 14px;font-family:var(--display-bold)}
     .login-form button,.ac-tab-button{appearance:none}
     .login-error{min-height:20px;margin:0;color:#b42318;font-family:var(--hand)}
-    @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}}
+    @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
     @media print{.v2nav,.ac-buddy,.tools,.login-screen{display:none!important}.head{padding-top:36px}.cards{padding-bottom:30px}}
   </style>
   <script defer src="/assets/app.js?v=20260629-v2-projects"></script>
@@ -109,118 +121,34 @@
         <h1>多面码SDK联合开发专项群</h1>
         <p>每个项目一张成绩单：联合开发进度用 Stella 星点亮，审阅通过盖章放行。</p>
         <div class="tools">
-          <a class="ac-tab ac-magnetic" data-magnetic="12" data-cursor-label="新建" href="#cards">+ 新建项目 ★</a>
+          <a id="new-project-link" class="ac-tab ac-magnetic" data-magnetic="12" data-cursor-label="新建" href="/projects/new">+ 新建项目 ★</a>
         </div>
       </section>
 
-      <section class="cards" id="cards">
-        <a class="report ac-reveal" data-cursor-label="View" href="#project-3" id="project-3">
-          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-          <div class="label">EDEN ACADEMY · REPORT CARD</div>
-          <h3>Aruco/Apriltag</h3>
-          <div class="owner">负责人 文灏 · 更新 2026-06-25 11:21</div>
-          <p class="intro">创建不同类型的tag并测试识别效果，计算物体在虚拟世界中的旋转和位置。通过检测识别 ArUco 和 AprilTag 计</p>
-          <div class="stella">
-            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <span class="grade">62%</span>
-          </div>
-          <div class="foot"><span>📒 4 份联合开发进度</span><span>AI 评估完成度</span></div>
-        </a>
+      <section class="cards" id="cards" aria-live="polite"></section>
 
-        <a class="report ac-reveal" data-cursor-label="View" href="#project-7" id="project-7">
-          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-          <div class="label">EDEN ACADEMY · REPORT CARD</div>
-          <h3>runtime</h3>
-          <div class="owner">负责人 王维 (jordan514) · 更新 2026-06-23 13:52</div>
-          <p class="intro">## 项目定位 **Monado Nibiru 运行时逆向重建**:以 **`.so` 二进制证据为唯一准绳**,逆向</p>
-          <div class="stella">
-            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <span class="grade">40%</span>
-          </div>
-          <div class="foot"><span>📒 1 份联合开发进度</span><span>AI 评估完成度</span></div>
-        </a>
-
-        <a class="report ac-reveal" data-cursor-label="View" href="#project-6" id="project-6">
-          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-          <div class="label">EDEN ACADEMY · REPORT CARD</div>
-          <h3>扩展研究</h3>
-          <div class="owner">负责人 wangwei · 更新 2026-06-23 12:14</div>
-          <p class="intro">## 项目定位 扩展研究用于跟踪非主线但可能支撑 XR、视觉感知、健康感知和沉浸式呈现能力的探索方向。本周聚焦两条线：</p>
-          <div class="stella">
-            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <span class="grade">25%</span>
-          </div>
-          <div class="foot"><span>📒 1 份联合开发进度</span><span>AI 评估完成度</span></div>
-        </a>
-
-        <a class="report ac-reveal" data-cursor-label="View" href="#project-2" id="project-2">
-          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-          <div class="label">EDEN ACADEMY · REPORT CARD</div>
-          <h3>光速1600（slam+tag）</h3>
-          <div class="owner">负责人 韩宇 陆宸胄 · 更新 2026-06-22 18:58</div>
-          <p class="intro">完成耀宇样机稀疏点云评估、平面场景转换及AprilTag拟合，实现重定位快速校准，通过rk3588 6DoF验证和大空间</p>
-          <div class="stella">
-            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <span class="grade">38%</span>
-          </div>
-          <div class="foot"><span>📒 3 份联合开发进度</span><span>AI 评估完成度</span></div>
-        </a>
-
-        <a class="report ac-reveal" data-cursor-label="View" href="#project-1" id="project-1">
-          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-          <div class="label">EDEN ACADEMY · REPORT CARD</div>
-          <h3>（灰度摄像头）手部感知追踪模型</h3>
-          <div class="owner">负责人 王威 · 更新 2026-06-16 13:00</div>
-          <p class="intro">面向 MR 头显（四路头戴**单色/灰度鱼眼相机**）的全栈手部追踪系统。针对灰度相机的低照度、快速运动、视角受限等挑战</p>
-          <div class="stella">
-            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <span class="grade">32%</span>
-          </div>
-          <div class="foot"><span>📒 3 份联合开发进度</span><span>AI 评估完成度</span></div>
-        </a>
-
-        <a class="report ac-reveal" data-cursor-label="View" href="#project-5" id="project-5">
-          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-          <div class="label">EDEN ACADEMY · REPORT CARD</div>
-          <h3>runtime 反编译（Monado Nibiru 运行时逆向重建）</h3>
-          <div class="owner">负责人 wangwei · 更新 2026-06-16 12:12</div>
-          <p class="intro">为 **RK3588 双系统（Android + Linux）AR 设备（代号 2560）** 逆向并重建 **Nibi</p>
-          <div class="stella">
-            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
-            <span class="grade">25%</span>
-          </div>
-          <div class="foot"><span>📒 1 份联合开发进度</span><span>AI 评估完成度</span></div>
-        </a>
+      <section id="new-project-page" class="project-form-section is-hidden" hidden>
+        <div class="project-form-card">
+          <h2>新建项目</h2>
+          <form id="project-form" class="project-form">
+            <label>项目名称<input id="project-name" type="text" required></label>
+            <div class="form-row">
+              <label>负责人<input id="project-owner" type="text"></label>
+              <label>完成度（0-100）<input id="project-completeness" type="number" min="0" max="100" value="0"></label>
+            </div>
+            <label>项目简介<textarea id="project-intro"></textarea></label>
+            <div class="form-actions">
+              <button class="ac-tab ac-magnetic" data-magnetic="12" type="submit">保存项目</button>
+              <a class="ac-tab ac-magnetic" data-magnetic="12" href="#cards">取消</a>
+            </div>
+          </form>
+        </div>
       </section>
 
       <section class="pj-extra">
         <div class="pj-stats">
-          <div class="ac-reveal"><b data-count="6">0</b><span>在册项目</span></div>
-          <div class="ac-reveal"><b data-count="13">0</b><span>累计联合开发进度</span></div>
+          <div class="ac-reveal"><b id="project-count" data-count="0">0</b><span>在册项目</span></div>
+          <div class="ac-reveal"><b id="entry-count" data-count="0">0</b><span>累计联合开发进度</span></div>
           <div class="ac-reveal"><b><span class="ac-star"></span> ∞</b><span>Stella 进度</span></div>
         </div>
         <div class="pj-rule">

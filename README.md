@@ -8,7 +8,8 @@
 - 访问用户名：`gszsyy`
 - 访问密码：`gszsyy1234`
 - 联合开发进度内容不读取本地 `http://10.40.92.74:8092/v2/projects` 的 SQLite 或上传文件
-- 当前 GitHub Pages 版保留原页面空状态，后续内容与本地 8092 独立维护
+- 当前 GitHub Pages 版初始项目列表为空，后续通过页面里的“新建项目”独立维护
+- GitHub Pages 版项目数据保存在当前浏览器 `localStorage`，不会同步到本地 8092
 - `下载 PDF` 使用浏览器端 `html2canvas + jsPDF`，CDN 不可用时退化到浏览器打印保存 PDF
 
 ## 本地预览

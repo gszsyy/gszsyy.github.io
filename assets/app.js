@@ -27,9 +27,11 @@
   var loginError = document.getElementById("login-error");
   var cards = document.getElementById("cards");
   var newProjectPage = document.getElementById("new-project-page");
+  var localProjectPage = document.getElementById("local-project-page");
   var projectForm = document.getElementById("project-form");
   var projectCount = document.getElementById("project-count");
   var entryCount = document.getElementById("entry-count");
+  var copyProjectJsonButton = document.getElementById("copy-project-json");
 
   var fields = {
     title: document.getElementById("report-title"),
@@ -117,7 +119,15 @@
 
   function mergeProjects(published, local) {
     var seen = {};
-    return published.concat(local).filter(function (project) {
+    var publishedList = published.map(function (project) {
+      return Object.assign({ localDraft: false }, project);
+    });
+    var localList = local.map(function (project) {
+      var copy = Object.assign({}, project);
+      copy.localDraft = true;
+      return copy;
+    });
+    return publishedList.concat(localList).filter(function (project) {
       var id = project && project.id;
       if (!id || seen[id]) return false;
       seen[id] = true;
@@ -155,13 +165,14 @@
     var score = Math.max(0, Math.min(100, Number(project.completeness) || 0));
     var owner = project.owner || "未填写";
     var intro = project.intro || "暂无简介。";
-    var url = project.url || ("#project-" + project.id);
+    var url = project.url || ("#local-project-" + project.id);
+    var draftLabel = project.localDraft ? " · 本机草稿" : "";
     return [
-      '<a class="report ac-reveal" href="' + escapeHtml(url) + '" id="project-' + escapeHtml(project.id) + '">',
+      '<a class="report ac-reveal" href="' + escapeHtml(url) + '" id="project-' + escapeHtml(project.id) + '"' + (project.localDraft ? ' data-local-project="' + escapeHtml(project.id) + '"' : "") + '>',
       '<img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">',
       '<div class="label">EDEN ACADEMY · REPORT CARD</div>',
       '<h3>' + escapeHtml(project.name) + '</h3>',
-      '<div class="owner">负责人 ' + escapeHtml(owner) + ' · 更新 ' + escapeHtml(project.updatedAt) + '</div>',
+      '<div class="owner">负责人 ' + escapeHtml(owner) + ' · 更新 ' + escapeHtml(project.updatedAt) + draftLabel + '</div>',
       '<p class="intro">' + escapeHtml(intro).slice(0, 90) + '</p>',
       '<div class="stella">' + starMarkup(score) + '<span class="grade">' + score + '%</span></div>',
       '<div class="foot"><span>📒 ' + (Number(project.entries) || 0) + ' 份联合开发进度</span><span>AI 评估完成度</span></div>',
@@ -198,6 +209,10 @@
       newProjectPage.hidden = false;
       newProjectPage.classList.remove("is-hidden");
     }
+    if (localProjectPage) {
+      localProjectPage.hidden = true;
+      localProjectPage.classList.add("is-hidden");
+    }
     if (cards) cards.classList.add("is-hidden");
   }
 
@@ -206,12 +221,64 @@
       newProjectPage.hidden = true;
       newProjectPage.classList.add("is-hidden");
     }
+    if (localProjectPage) {
+      localProjectPage.hidden = true;
+      localProjectPage.classList.add("is-hidden");
+    }
     if (cards) cards.classList.remove("is-hidden");
+  }
+
+  function projectManifestEntry(project) {
+    return {
+      id: project.id,
+      name: project.name,
+      owner: project.owner || "未填写",
+      intro: project.intro || "",
+      completeness: Number(project.completeness) || 0,
+      entries: Number(project.entries) || 0,
+      updatedAt: project.updatedAt || nowLabel(),
+      url: project.url || ("/projects/" + project.id + "/")
+    };
+  }
+
+  function findLocalProject(id) {
+    return loadProjects().find(function (project) {
+      return project.id === id;
+    });
+  }
+
+  function showLocalProjectDetail(id) {
+    var project = findLocalProject(id);
+    if (!project || !localProjectPage) {
+      showProjectList();
+      return;
+    }
+    var title = document.getElementById("local-project-title");
+    var meta = document.getElementById("local-project-meta");
+    var intro = document.getElementById("local-project-intro");
+    var phased = document.getElementById("local-project-phased");
+    var finalGoals = document.getElementById("local-project-final");
+    var reviewJson = document.getElementById("local-project-json");
+    if (title) title.textContent = project.name || "未命名项目";
+    if (meta) meta.textContent = "负责人 " + (project.owner || "未填写") + " · 更新 " + (project.updatedAt || "未填写") + " · 本机草稿";
+    if (intro) intro.textContent = project.intro || "未填写";
+    if (phased) phased.textContent = project.phasedGoals || "未填写";
+    if (finalGoals) finalGoals.textContent = project.finalGoals || "未填写";
+    if (reviewJson) reviewJson.value = JSON.stringify(projectManifestEntry(project), null, 2);
+    if (newProjectPage) {
+      newProjectPage.hidden = true;
+      newProjectPage.classList.add("is-hidden");
+    }
+    if (cards) cards.classList.add("is-hidden");
+    localProjectPage.hidden = false;
+    localProjectPage.classList.remove("is-hidden");
   }
 
   function syncRoute() {
     if (location.hash === "#new") {
       showProjectForm();
+    } else if (location.hash.indexOf("#local-project-") === 0) {
+      showLocalProjectDetail(location.hash.replace("#local-project-", ""));
     } else {
       showProjectList();
     }
@@ -375,6 +442,31 @@
       if (notice) notice.textContent = "已保存为本机草稿。要让其他设备看到，需要审核后发布到托管项目清单。";
       location.hash = "#cards";
       syncRoute();
+    });
+  }
+
+  if (cards) {
+    cards.addEventListener("click", function (event) {
+      var link = event.target.closest && event.target.closest("[data-local-project]");
+      if (!link) return;
+      event.preventDefault();
+      location.hash = "#local-project-" + link.getAttribute("data-local-project");
+      syncRoute();
+    });
+  }
+
+  if (copyProjectJsonButton) {
+    copyProjectJsonButton.addEventListener("click", function () {
+      var reviewJson = document.getElementById("local-project-json");
+      if (!reviewJson) return;
+      reviewJson.select();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(reviewJson.value).catch(function () {});
+      } else {
+        document.execCommand("copy");
+      }
+      copyProjectJsonButton.textContent = "已复制审核 JSON";
+      setTimeout(function () { copyProjectJsonButton.textContent = "复制审核 JSON"; }, 1400);
     });
   }
 

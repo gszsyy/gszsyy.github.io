@@ -55,6 +55,17 @@
     .form-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
     .form-actions button,.form-actions a{border:0;cursor:pointer}
     .publish-note{margin:12px 0 0;color:#8a5a12;background:#fff8d8;border-left:5px solid var(--gold);border-radius:8px;padding:10px 12px;font-family:var(--display-bold);line-height:1.55}
+    .project-detail-section{max-width:920px;margin:0 auto 70px;padding:0 clamp(16px,4vw,40px)}
+    .project-detail-card{background:#fffdf3;border:2px solid var(--gold);border-radius:14px;padding:28px 26px;box-shadow:0 14px 32px rgba(90,70,30,.18);position:relative}
+    .project-detail-card:before{content:"";position:absolute;inset:7px;border:1px dashed rgba(201,162,74,.65);border-radius:9px;pointer-events:none}
+    .project-detail-card>*{position:relative}
+    .project-detail-card h2{font-family:var(--display-bold);color:var(--green-deep);font-size:30px;margin:0 0 8px}
+    .project-detail-meta{font-family:var(--hand);color:var(--muted);margin:0 0 16px}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+    .detail-block{background:#fff8d8;border-left:5px solid var(--green-deep);border-radius:8px;padding:14px;color:#3a2d16;line-height:1.65;white-space:pre-wrap}
+    .detail-block:nth-child(2){border-color:var(--pink-deep)}
+    .detail-block b{display:block;font-family:var(--display-bold);color:var(--green-deep);margin-bottom:6px}
+    .review-json{width:100%;min-height:170px;box-sizing:border-box;border:2px solid rgba(201,162,74,.7);border-radius:8px;background:#fff7bd;color:#172033;padding:12px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
     .v2foot{background:#3a2d16;color:rgba(243,232,205,.82);padding:46px clamp(24px,7vw,90px);font-family:var(--hand);border-top:2px dashed var(--gold);position:relative;z-index:2}
     .v2foot b{color:var(--gold);font-family:var(--display-bold)}
     .pj-extra{position:relative;z-index:2;padding:10px 0 90px}
@@ -74,10 +85,10 @@
     .login-form input{width:100%;box-sizing:border-box;border:2px solid rgba(201,162,74,.7);border-radius:8px;background:#fff7bd;color:#172033;padding:13px 14px;font-family:var(--display-bold)}
     .login-form button,.ac-tab-button{appearance:none}
     .login-error{min-height:20px;margin:0;color:#b42318;font-family:var(--hand)}
-    @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
+    @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}.form-row,.detail-grid{grid-template-columns:1fr}}
     @media print{.v2nav,.ac-buddy,.tools,.login-screen{display:none!important}.head{padding-top:36px}.cards{padding-bottom:30px}}
   </style>
-  <script defer src="/assets/app.js?v=20260629-v5-project-manifest"></script>
+  <script defer src="/assets/app.js?v=20260629-v6-local-detail"></script>
 </head>
 <body class="ac-root">
   <div class="bg" aria-hidden="true"></div>
@@ -147,6 +158,37 @@
               <a class="ac-tab ac-magnetic" data-magnetic="12" href="#cards">取消</a>
             </div>
           </form>
+        </div>
+      </section>
+
+      <section id="local-project-page" class="project-detail-section is-hidden" hidden>
+        <div class="project-detail-card">
+          <p class="publish-note">本页面展示的是本机草稿项目。审核通过并写入托管项目清单后，其他设备才会同步显示。</p>
+          <h2 id="local-project-title">项目详情</h2>
+          <p id="local-project-meta" class="project-detail-meta"></p>
+          <div class="detail-block">
+            <b>项目简介</b>
+            <div id="local-project-intro"></div>
+          </div>
+          <div class="detail-grid">
+            <div class="detail-block">
+              <b>阶段性目标</b>
+              <div id="local-project-phased"></div>
+            </div>
+            <div class="detail-block">
+              <b>最终目标</b>
+              <div id="local-project-final"></div>
+            </div>
+          </div>
+          <label>审核发布用 JSON<textarea id="local-project-json" class="review-json" readonly></textarea></label>
+          <div class="detail-block">
+            <b>审核进入托管清单流程</b>
+            <div>1. 检查上方项目简介、阶段性目标和最终目标是否完整、可公开。&#10;2. 复制“审核发布用 JSON”，加入仓库的 assets/projects.json。&#10;3. 如需正式详情页，同时创建 /projects/项目ID/ 页面并把 JSON 中的 url 指向该页面。&#10;4. 提交并发布 GitHub Pages 后，其他设备会从托管清单同步看到该项目卡片。</div>
+          </div>
+          <div class="form-actions">
+            <button id="copy-project-json" class="ac-tab ac-magnetic" data-magnetic="12" type="button">复制审核 JSON</button>
+            <a class="ac-tab ac-magnetic" data-magnetic="12" href="#cards">返回项目列表</a>
+          </div>
         </div>
       </section>
 

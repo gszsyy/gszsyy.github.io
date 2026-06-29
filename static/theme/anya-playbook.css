@@ -1,0 +1,27 @@
+/* anya-playbook.css — 注入到 VitePress 指南页的轻量主题（保守：不改正文配色，保可读性） */
+:root{
+  --vp-c-brand-1:#1F7D57; --vp-c-brand-2:#2FA877; --vp-c-brand-3:#2FA877;
+  --vp-c-brand-soft:rgba(47,168,119,.16);
+  --vp-c-brand:#1F7D57;
+  --vp-button-brand-bg:#C9A24A; --vp-button-brand-hover-bg:#E2729C;
+  --vp-button-brand-border:#C9A24A; --vp-button-brand-hover-border:#E2729C;
+}
+/* 顶部金色/危险条提示这是同一个工程化手册站点 */
+.VPNav, .VPLocalNav{border-bottom:2px solid #C9A24A !important}
+.VPNavBar .title{font-family:"Yuanti SC","幼圆","Comic Sans MS",inherit !important}
+.VPNavBar .title:before{content:"★ ";color:#C9A24A}
+.VPSidebarItem.is-active .text, .VPLink.active{color:#1F7D57 !important}
+.vp-doc h1, .vp-doc h2{position:relative}
+.vp-doc h2:before{content:"★ ";color:#C9A24A;font-size:.8em}
+
+/* 固定角落阿尼亚挂件（链回任务大厅） */
+.anya-peek{position:fixed;right:16px;bottom:16px;z-index:60;width:96px;
+  filter:drop-shadow(0 10px 16px rgba(26,23,20,.3));animation:anya-peek-bob 5s ease-in-out infinite;transition:transform .2s ease;text-decoration:none}
+.anya-peek img{width:100%;display:block;pointer-events:none}
+.anya-peek .tip{position:absolute;left:-10px;top:-14px;transform:rotate(-6deg);
+  background:#FFFDF6;border:1.5px solid #C9A24A;color:#241C18;font-family:"Yuanti SC","幼圆","Comic Sans MS",sans-serif;
+  font-size:11px;padding:3px 9px;border-radius:10px;white-space:nowrap;box-shadow:0 4px 10px rgba(26,23,20,.18)}
+.anya-peek:hover{transform:translateY(-4px) rotate(-3deg) scale(1.05)}
+@keyframes anya-peek-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media (max-width:720px){.anya-peek{width:64px}.anya-peek .tip{display:none}}
+@media (prefers-reduced-motion:reduce){.anya-peek{animation:none}}

@@ -1,0 +1,128 @@
+/* ============================================================
+   anya-core.css — 全站间谍过家家核心皮肤（5 页共用）
+   仅 transform/opacity 动画；prefers-reduced-motion 降级。
+   配合 anya-core.js（单 rAF）。资产：/static/cloned-assets/spyfamily/
+   ============================================================ */
+@font-face{font-family:ClashDisplayR;src:url("/static/cloned-assets/yannesidibe/ClashDisplay_Regular-s.p.0vhwyri2qfjfu-c2f8e2b02528.woff2") format("woff2");font-display:swap}
+@font-face{font-family:ClashDisplayB;src:url("/static/cloned-assets/yannesidibe/ClashDisplay_Bold-s.p.0uri1jo8hft.n-3c345c7cbcdf.woff2") format("woff2");font-display:swap}
+@font-face{font-family:August;src:url("/static/cloned-assets/yannesidibe/August_Bold-s.p.0fl7ipqxj-oi--21e1a4f366ac.woff2") format("woff2");font-display:swap}
+:root{
+  --pink:#F2A7C0; --pink-soft:#FAD9E4; --pink-deep:#E2729C;
+  --green:#2FA877; --green-deep:#1F7D57;
+  --cream:#F7E9CC; --cream-2:#FBF3E0; --paper:#FFFDF6;
+  --gold:#C9A24A; --gold-soft:#E7D4A0;
+  --uniform:#1A1714; --uniform-2:#2A241E;
+  --stamp:#C0362C; --ink:#241C18; --muted:#6B5E52;
+  --line:rgba(36,28,24,.16);
+  --cn:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Segoe UI",sans-serif;
+  --display:ClashDisplayR,var(--cn);
+  --display-bold:ClashDisplayB,var(--cn);
+  --poster:August,ClashDisplayB,var(--cn);
+  --hand:"Yuanti SC","幼圆","Hiragino Maru Gothic Pro","Comic Sans MS",var(--display-bold);
+  --sf:/static/cloned-assets/spyfamily;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+.ac-root{position:relative;isolation:isolate;--pointer-x:50vw;--pointer-y:50vh;--tilt-x:0;--tilt-y:0;--scroll:0}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+img{display:block;max-width:100%}
+/* ---- paper / benday / hazard / tape ---- */
+.ac-paper{background:var(--cream);background-image:radial-gradient(rgba(36,28,24,.05) 1.2px,transparent 1.3px);background-size:16px 16px}
+.ac-benday{background-image:radial-gradient(rgba(36,28,24,.1) 1.4px,transparent 1.5px);background-size:14px 14px}
+.ac-hazard{background:repeating-linear-gradient(45deg,var(--gold) 0 14px,var(--uniform) 14px 28px)}
+.ac-tape{position:relative}
+.ac-tape:before{content:"";position:absolute;left:50%;top:-12px;width:84px;height:24px;transform:translateX(-50%) rotate(-3deg);background:rgba(201,162,74,.5);border-left:1px dashed rgba(255,255,255,.5);border-right:1px dashed rgba(255,255,255,.5)}
+/* ---- stamp / star / bubble / folder / polaroid ---- */
+.ac-stamp{font-family:var(--poster);color:var(--stamp);border:3px solid var(--stamp);border-radius:8px;padding:4px 12px;text-transform:uppercase;letter-spacing:.04em;opacity:.88;box-shadow:inset 0 0 0 1px rgba(192,54,44,.35)}
+.ac-star{width:1em;height:1em;display:inline-block;background:url("/static/cloned-assets/spyfamily/star-mini.png") center/contain no-repeat;vertical-align:middle}
+.ac-bubble{position:relative;background:var(--paper);border:2px solid var(--ink);border-radius:24px;padding:18px 22px;box-shadow:6px 6px 0 rgba(36,28,24,.85)}
+.ac-bubble:after{content:"";position:absolute;left:34px;bottom:-15px;width:24px;height:24px;background:var(--paper);border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
+.ac-polaroid{background:var(--paper);padding:12px 12px 38px;border-radius:4px;box-shadow:0 16px 36px rgba(26,23,20,.3);transform:rotate(var(--rot,-2deg))}
+.ac-polaroid img{width:100%;border-radius:2px}
+.ac-folder{position:relative;background:var(--gold-soft);border:1.5px solid var(--gold);border-radius:6px 14px 14px 14px}
+.ac-folder:before{content:"";position:absolute;left:14px;top:-12px;width:120px;height:14px;background:var(--gold-soft);border:1.5px solid var(--gold);border-bottom:0;border-radius:8px 8px 0 0}
+.ac-tab{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;background:var(--gold);color:var(--uniform);font-family:var(--display-bold);border-radius:4px 14px 14px 4px;box-shadow:0 6px 0 rgba(26,23,20,.22);transition:transform .16s ease,box-shadow .16s ease,background .16s ease}
+.ac-tab:hover{transform:translateY(-3px) rotate(-1deg);box-shadow:0 9px 0 rgba(26,23,20,.22);background:var(--pink)}
+/* ---- floaters ---- */
+.ac-floaters{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.ac-floaters img{position:absolute;width:var(--w,68px);opacity:var(--op,.9);filter:drop-shadow(0 8px 14px rgba(26,23,20,.18));animation:ac-float var(--dur,11s) ease-in-out infinite;animation-delay:var(--delay,0s)}
+/* ---- cursor reticle ---- */
+.ac-cursor{position:fixed;z-index:99;left:-80px;top:-80px;width:24px;height:24px;display:grid;place-items:center;border:2px solid var(--stamp);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);opacity:0;transition:opacity .16s,width .18s,height .18s,background .18s;will-change:left,top,width,height}
+.ac-cursor:before,.ac-cursor:after{content:"";position:absolute;background:var(--stamp);opacity:.8}
+.ac-cursor:before{width:2px;height:11px;top:-13px}
+.ac-cursor:after{width:11px;height:2px;left:-13px}
+.ac-root.is-pointer .ac-cursor{opacity:1}
+.ac-cursor-core{width:6px;height:6px;border-radius:50%;background:var(--stamp)}
+.ac-cursor-label{position:absolute;inset:0;display:grid;place-items:center;color:var(--paper);background:var(--stamp);border-radius:50%;font-family:var(--display-bold);font-size:12px;opacity:0;transform:scale(.7);transition:opacity .16s,transform .16s}
+.ac-cursor.is-view{width:74px;height:74px;background:var(--stamp)}
+.ac-cursor.is-view:before,.ac-cursor.is-view:after{opacity:0}
+.ac-cursor.is-view .ac-cursor-core{opacity:0}
+.ac-cursor.is-view .ac-cursor-label{opacity:1;transform:scale(1)}
+.ac-magnetic{will-change:transform;transition:transform .16s ease}
+/* ---- blink eye (SVG mascot) ---- */
+.ac-eye{display:inline-block;width:1em;height:1em;vertical-align:middle}
+.ac-eye .lid{transform-box:fill-box;transform-origin:center;animation:ac-blink 5.2s infinite}
+@keyframes ac-blink{0%,92%,100%{transform:scaleY(.05)}94%,98%{transform:scaleY(1)}}
+/* ---- Anya buddy (cursor-reactive, frame-swap = video feel) ---- */
+.ac-buddy{position:fixed;left:18px;bottom:18px;z-index:50;width:clamp(118px,11vw,170px);aspect-ratio:3/4;display:block;filter:drop-shadow(0 12px 18px rgba(26,23,20,.4));transform-origin:bottom center;will-change:transform}
+.ac-buddy .f{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:bottom;opacity:0;transition:opacity .18s ease}
+.ac-buddy .f0{opacity:1}
+.ac-buddy.is-look .f0{opacity:0}.ac-buddy.is-look .f2{opacity:1}
+.ac-buddy.is-excited .f0,.ac-buddy.is-excited .f2{opacity:0}.ac-buddy.is-excited .f1{opacity:1}
+.ac-buddy .bubble{position:absolute;right:-10px;top:-22px;transform:rotate(-5deg);background:var(--paper);border:2px solid var(--ink);color:var(--ink);font-family:var(--hand);font-size:13px;padding:5px 11px;border-radius:13px;white-space:nowrap;box-shadow:4px 4px 0 rgba(36,28,24,.85);opacity:0;transition:opacity .2s ease}
+.ac-buddy.is-talk .bubble{opacity:1}
+.ac-buddy .bubble:after{content:"";position:absolute;left:16px;bottom:-9px;width:12px;height:12px;background:var(--paper);border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
+/* ---- 3D utils ---- */
+.ac-tilt3d{transition:transform .2s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d;will-change:transform}
+.ac-parallax{will-change:transform}
+/* ---- reveal ---- */
+.ac-reveal{opacity:0;transform:translateY(48px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.ac-reveal.is-in{opacity:1;transform:none}
+/* ---- PV poster (lazy youtube) ---- */
+.ac-pv{position:relative;border-radius:16px;overflow:hidden;border:3px solid var(--gold);box-shadow:0 18px 40px rgba(26,23,20,.3);cursor:pointer}
+.ac-pv img{width:100%;display:block}
+.ac-pv .play{position:absolute;inset:0;display:grid;place-items:center}
+.ac-pv .play b{width:74px;height:74px;border-radius:50%;background:var(--stamp);color:#fff;display:grid;place-items:center;font-size:30px;box-shadow:0 8px 24px rgba(0,0,0,.4);transition:transform .2s ease}
+.ac-pv:hover .play b{transform:scale(1.12)}
+.ac-pv iframe{width:100%;aspect-ratio:16/9;display:block;border:0}
+/* ---- auto PV / TV ---- */
+.ac-pv.is-auto{aspect-ratio:16/9;cursor:default}
+.ac-pv.is-auto iframe{width:100%;height:100%;display:block;border:0}
+.ac-pv .play{transition:opacity .2s}
+.ac-pv.is-auto .play{display:none}
+/* ---- scroll progress bar ---- */
+.ac-progress{position:fixed;top:0;left:0;height:4px;width:100%;transform:scaleX(var(--scroll,0));transform-origin:left;background:linear-gradient(90deg,var(--pink),var(--gold),var(--green));z-index:90;pointer-events:none}
+/* ---- accordion (打开方式) ---- */
+.ac-acc-item{border:1.5px solid var(--line);border-radius:14px;background:var(--paper);overflow:hidden;margin-bottom:14px;box-shadow:0 8px 20px rgba(26,23,20,.08)}
+.ac-acc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;cursor:pointer;font-family:var(--display-bold);color:var(--green-deep);font-size:19px}
+.ac-acc-head .pl{flex:0 0 auto;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;background:var(--gold);color:var(--uniform);font-size:18px;transition:transform .25s}
+.ac-acc-item.open .ac-acc-head .pl{transform:rotate(45deg);background:var(--pink)}
+.ac-acc-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s ease}
+.ac-acc-item.open .ac-acc-body{grid-template-rows:1fr}
+.ac-acc-body>div{overflow:hidden;font-family:var(--hand);color:var(--muted);padding:0 22px}
+.ac-acc-item.open .ac-acc-body>div{padding:0 22px 18px}
+/* ---- dropdown (下拉) ---- */
+.ac-dd{position:relative;display:inline-block}
+.ac-dd-menu{position:absolute;top:calc(100% + 8px);left:0;min-width:190px;background:var(--paper);border:2px solid var(--ink);border-radius:12px;box-shadow:6px 6px 0 rgba(36,28,24,.85);padding:6px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .18s,transform .18s,visibility .18s;z-index:30}
+.ac-dd-menu.open{opacity:1;visibility:visible;transform:none}
+.ac-dd-menu a{display:block;padding:9px 13px;border-radius:8px;font-family:var(--hand);color:var(--ink)}
+.ac-dd-menu a:hover{background:var(--pink-soft);color:var(--green-deep)}
+/* ---- horizontal wheel scroll (滚轮卷宗) ---- */
+.ac-hscroll{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 16px;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
+.ac-hscroll::-webkit-scrollbar{height:8px}
+.ac-hscroll::-webkit-scrollbar-thumb{background:var(--gold);border-radius:8px}
+.ac-hscroll>*{scroll-snap-align:start;flex:0 0 auto}
+/* ---- keyframes ---- */
+@keyframes ac-spin{to{transform:rotate(360deg)}}
+@keyframes ac-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-22px) rotate(8deg)}}
+@keyframes ac-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes ac-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(9px)}}
+@keyframes ac-marquee{to{transform:translateX(-50%)}}
+@media (max-width:720px){.ac-buddy{display:none}.ac-cursor{display:none}}
+@media (prefers-reduced-motion:reduce){
+  .ac-floaters img,.ac-eye .lid,.ac-buddy{animation:none}
+  .ac-tilt3d,.ac-reveal,.ac-magnetic{transition:none}
+  .ac-reveal{opacity:1;transform:none}
+}
+

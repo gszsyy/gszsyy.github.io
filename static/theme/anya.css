@@ -1,0 +1,82 @@
+/* ============================================================
+   Anya / 间谍过家家 共享主题皮肤
+   覆盖 base.html 的 CSS 变量与组件，使所有子模块页与
+   /preview/yannesidibe-cn 视觉一致。非破坏式：只改皮肤，不改结构。
+   ============================================================ */
+:root{
+  --bg:#F7E9CC; --bg-soft:#FFFDF6; --bg-alt:#FBF3E0;
+  --text:#241C18; --text-soft:#6B5E52;
+  --border:#E3D2A8; --brand:#1F7D57; --brand-soft:#F2A7C0; --accent:#C9A24A;
+  --warn-bg:#FBEFD0; --warn-bd:#E3C879; --code-bg:#FBF3E0; --radius:14px;
+  --anya-pink:#F2A7C0; --anya-green:#2FA877; --anya-gold:#C9A24A;
+  --anya-uniform:#1A1714; --anya-stamp:#C0362C;
+  --anya-hand:"Yuanti SC","幼圆","Hiragino Maru Gothic Pro","Comic Sans MS",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1A1714; --bg-soft:#241D16; --bg-alt:#2A2018;
+    --text:#F7E9CC; --text-soft:#C9B79A;
+    --border:#3A2F22; --brand:#7CD9AE; --brand-soft:#E2729C; --accent:#E7D4A0;
+    --warn-bg:#2B2410; --warn-bd:#5C4A18; --code-bg:#201913;
+  }
+}
+/* paper texture */
+body{
+  background-image:radial-gradient(rgba(36,28,24,.05) 1.2px,transparent 1.3px);
+  background-size:16px 16px;
+}
+@media (prefers-color-scheme: dark){body{background-image:radial-gradient(rgba(247,233,204,.05) 1.2px,transparent 1.3px)}}
+
+/* nav band : washi-tape gold underline + handwritten brand */
+header.nav{border-bottom:2px solid var(--anya-gold)}
+header.nav .brand{font-family:var(--anya-hand);font-weight:800;letter-spacing:.01em}
+header.nav .brand span{color:var(--anya-pink)}
+header.nav .brand:before{content:"★";color:var(--anya-gold);margin-right:.32rem}
+.nav a.link:hover{color:var(--anya-green)}
+
+/* buttons as file-tab / sticker */
+.btn{border-radius:6px 14px 14px 6px;border:1.5px solid var(--border);background:var(--bg-soft);box-shadow:0 3px 0 rgba(26,23,20,.12)}
+.btn:hover{border-color:var(--anya-pink);transform:translateY(-2px);box-shadow:0 5px 0 rgba(26,23,20,.12)}
+.btn.primary{background:var(--anya-gold);color:var(--anya-uniform);border-color:var(--anya-gold)}
+.btn.primary:hover{filter:brightness(1.05)}
+
+/* headings */
+h1{font-family:var(--anya-hand);letter-spacing:0}
+h1:after{content:"";display:block;width:54px;height:5px;margin-top:.4rem;border-radius:4px;
+  background:linear-gradient(90deg,var(--anya-pink),var(--anya-gold))}
+h2{position:relative;padding-left:1.1rem}
+h2:before{content:"★";position:absolute;left:0;color:var(--anya-gold);font-size:.8em;top:.15em}
+
+/* cards : dossier paper */
+.card{background:var(--bg-soft);border:1.5px solid var(--border);box-shadow:0 8px 22px rgba(26,23,20,.08)}
+.card:hover{border-color:var(--anya-pink);box-shadow:0 14px 30px rgba(26,23,20,.12)}
+.card h3{color:var(--anya-green)}
+
+/* pills */
+.pill.cat{background:var(--anya-pink);color:var(--anya-uniform)}
+.pill{border-color:var(--border)}
+
+/* notices keep warm */
+.notice{background:var(--warn-bg);border-color:var(--warn-bd)}
+
+/* footer */
+footer{border-top:2px dashed var(--anya-gold)}
+footer:before{content:"OPERATION · PLAYBOOK　";font-family:var(--anya-hand);color:var(--anya-gold)}
+
+/* ---- fixed corner Anya peek mascot (links to themed preview) ---- */
+.anya-peek{
+  position:fixed;right:14px;bottom:14px;z-index:40;width:104px;
+  filter:drop-shadow(0 10px 16px rgba(26,23,20,.28));
+  animation:anya-bob 5s ease-in-out infinite;transition:transform .2s ease;
+}
+.anya-peek img{width:100%;display:block;pointer-events:none}
+.anya-peek .tip{
+  position:absolute;left:-8px;top:-14px;transform:rotate(-6deg);
+  background:var(--bg-soft);border:1.5px solid var(--anya-gold);color:var(--text);
+  font-family:var(--anya-hand);font-size:11px;padding:3px 8px;border-radius:10px;white-space:nowrap;
+  box-shadow:0 4px 10px rgba(26,23,20,.18);
+}
+.anya-peek:hover{transform:translateY(-4px) rotate(-3deg) scale(1.04)}
+@keyframes anya-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media (max-width:720px){.anya-peek{width:72px;right:8px;bottom:8px}.anya-peek .tip{display:none}}
+@media (prefers-reduced-motion:reduce){.anya-peek{animation:none}}

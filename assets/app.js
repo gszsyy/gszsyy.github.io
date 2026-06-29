@@ -44,22 +44,26 @@
 
   function updatePreview() {
     if (!preview.title || !preview.period || !preview.owner) return;
-    preview.title.textContent = textOrDefault(fields.title.value);
-    preview.period.textContent = textOrDefault(fields.period.value);
-    preview.owner.textContent = textOrDefault(fields.owner.value);
-    renderBlock(preview.done, fields.done.value);
-    renderBlock(preview.risks, fields.risks.value);
-    renderBlock(preview.next, fields.next.value);
+    preview.title.textContent = textOrDefault(fieldValue("title"));
+    preview.period.textContent = textOrDefault(fieldValue("period"));
+    preview.owner.textContent = textOrDefault(fieldValue("owner"));
+    renderBlock(preview.done, fieldValue("done"));
+    renderBlock(preview.risks, fieldValue("risks"));
+    renderBlock(preview.next, fieldValue("next"));
+  }
+
+  function fieldValue(key) {
+    return fields[key] ? fields[key].value : "";
   }
 
   function currentDraft() {
     return {
-      title: fields.title.value,
-      period: fields.period.value,
-      owner: fields.owner.value,
-      done: fields.done.value,
-      risks: fields.risks.value,
-      next: fields.next.value
+      title: fieldValue("title"),
+      period: fieldValue("period"),
+      owner: fieldValue("owner"),
+      done: fieldValue("done"),
+      risks: fieldValue("risks"),
+      next: fieldValue("next")
     };
   }
 
@@ -73,7 +77,7 @@
       if (!raw) return;
       var data = JSON.parse(raw);
       Object.keys(fields).forEach(function (key) {
-        if (typeof data[key] === "string") fields[key].value = data[key];
+        if (fields[key] && typeof data[key] === "string") fields[key].value = data[key];
       });
     } catch (error) {
       console.warn("draft load failed", error);
@@ -195,11 +199,13 @@
     button.textContent = "正在生成 PDF";
     button.disabled = true;
     var target = document.getElementById("pdf-target");
-    var filename = (textOrDefault(fields.period.value) + "-" + textOrDefault(fields.title.value))
+    var period = fieldValue("period") || new Date().toISOString().slice(0, 10);
+    var title = fieldValue("title") || document.title || "多面码SDK联合开发专项群联合开发进度";
+    var filename = (textOrDefault(period) + "-" + textOrDefault(title))
       .replace(/[\\/:*?"<>|]+/g, "-") + ".pdf";
 
     try {
-      if (await ensurePdfLibraries()) {
+      if (target && await ensurePdfLibraries()) {
         var canvas = await window.html2canvas(target, { scale: 2, backgroundColor: "#ffffff" });
         var imgData = canvas.toDataURL("image/png");
         var pdf = new window.jspdf.jsPDF("p", "mm", "a4");

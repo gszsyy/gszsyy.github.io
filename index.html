@@ -1,97 +1,141 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>多面码SDK联合开发专项群</title>
-  <link rel="stylesheet" href="assets/site.css">
-  <script defer src="assets/app.js?v=20260629-login-fix"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多面码SDK联合开发专项群 · 联合开发进度</title>
+  <link rel="icon" href="/static/cloned-assets/yannesidibe/favicon-2798b8585809.ico">
+  <link rel="stylesheet" href="/static/theme/anya-core.css">
+  <style>
+    body{margin:0;background:#efe2c4;color:var(--ink);font-family:var(--display);overflow-x:hidden}
+    button,input{font:inherit}
+    .is-hidden{display:none!important}
+    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(rgba(120,90,40,.07) 1.3px,transparent 1.4px) 0 0/15px 15px,linear-gradient(180deg,#f3e8cd,#e6d6b2)}
+    .v2nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;gap:18px;padding:16px 24px;color:#3a2d16;transition:background .25s,backdrop-filter .25s}
+    .v2nav.is-scrolled{background:linear-gradient(180deg,rgba(239,226,196,.95),rgba(239,226,196,0));backdrop-filter:blur(6px)}
+    .v2nav .brand{font-family:var(--hand);font-weight:800;font-size:19px;display:inline-flex;align-items:center;gap:8px}
+    .v2nav .brand .ac-eye{width:19px;height:19px;color:var(--green-deep)}
+    .v2nav .sp{flex:1}
+    .v2nav a.l,.v2nav button.l{font-family:var(--display-bold);font-size:15px;color:#5a4626;background:transparent;border:0;padding:0;cursor:pointer}
+    .v2nav a.l:hover,.v2nav button.l:hover{color:var(--pink-deep)}
+    main{position:relative;z-index:2}
+    .head{text-align:center;padding:124px 24px 20px;position:relative}
+    .head .kf{font-family:var(--poster);color:transparent;-webkit-text-stroke:1.4px var(--green-deep);font-size:clamp(22px,3.4vw,46px);letter-spacing:.08em;text-transform:uppercase;margin:0}
+    .head h1{font-family:var(--hand);font-size:clamp(38px,7vw,86px);color:var(--green-deep);margin:8px 0 0}
+    .head p{font-family:var(--hand);color:var(--muted);margin:12px 0 0}
+    .anya{position:absolute;left:5%;bottom:-30px;width:min(16vw,150px);filter:drop-shadow(0 14px 22px rgba(0,0,0,.3));pointer-events:none}
+    .tools{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:24px 0 10px}
+    .cards{max-width:1100px;margin:0 auto;padding:24px clamp(16px,4vw,40px) 88px;display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:26px}
+    .empty{grid-column:1/-1;text-align:center;font-family:var(--hand);color:var(--muted);padding:42px;background:#fffdf3;border:2px solid var(--gold);border-radius:14px;box-shadow:0 14px 32px rgba(90,70,30,.18);position:relative}
+    .empty:before{content:"";position:absolute;inset:6px;border:1px dashed rgba(201,162,74,.6);border-radius:9px;pointer-events:none}
+    .empty b{display:block;font-family:var(--display-bold);color:var(--green-deep);font-size:24px;margin-bottom:8px}
+    .v2foot{background:#3a2d16;color:rgba(243,232,205,.82);padding:46px clamp(24px,7vw,90px);font-family:var(--hand);border-top:2px dashed var(--gold);position:relative;z-index:2}
+    .v2foot b{color:var(--gold);font-family:var(--display-bold)}
+    .pj-extra{position:relative;z-index:2;padding:10px 0 90px}
+    .pj-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:760px;margin:0 auto 10px;padding:0 16px;text-align:center}
+    .pj-stats b{font-family:var(--poster);font-size:clamp(30px,5vw,56px);color:var(--pink-deep);display:block;line-height:1}
+    .pj-stats span{font-family:var(--hand);color:var(--muted)}
+    .pj-rule{max-width:820px;margin:44px auto 0;padding:0 16px}
+    .pj-rule h2{font-family:var(--poster);color:var(--green-deep);text-transform:uppercase;font-size:clamp(26px,4vw,46px);margin:0 0 18px}
+    .login-screen{position:relative;z-index:80;min-height:100vh;display:grid;place-items:center;padding:24px}
+    .login-panel{width:min(460px,100%);background:#fffdf3;border:2px solid var(--gold);border-radius:14px;padding:32px 30px;box-shadow:0 18px 42px rgba(90,70,30,.22);position:relative}
+    .login-panel:before{content:"";position:absolute;inset:7px;border:1px dashed rgba(201,162,74,.65);border-radius:9px;pointer-events:none}
+    .login-panel>*{position:relative}
+    .login-panel .kf{font-family:var(--poster);color:var(--green-deep);font-size:13px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 8px}
+    .login-panel h1{font-family:var(--display-bold);font-size:clamp(28px,6vw,38px);line-height:1.12;color:#172033;margin:0 0 18px}
+    .login-form{display:grid;gap:16px}
+    .login-form label{display:grid;gap:7px;font-family:var(--display-bold);color:#3a2d16}
+    .login-form input{width:100%;box-sizing:border-box;border:2px solid rgba(201,162,74,.7);border-radius:8px;background:#fff7bd;color:#172033;padding:13px 14px;font-family:var(--display-bold)}
+    .login-form button,.ac-tab-button{appearance:none}
+    .login-error{min-height:20px;margin:0;color:#b42318;font-family:var(--hand)}
+    @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}}
+    @media print{.v2nav,.ac-buddy,.tools,.login-screen{display:none!important}.head{padding-top:36px}.cards{padding-bottom:30px}}
+  </style>
+  <script defer src="/assets/app.js?v=20260629-v2-projects"></script>
 </head>
-<body>
+<body class="ac-root">
+  <div class="bg" aria-hidden="true"></div>
+  <div class="ac-cursor" aria-hidden="true"><span class="ac-cursor-core"></span><span class="ac-cursor-label">View</span></div>
+
   <section id="login-screen" class="login-screen" aria-labelledby="login-title">
     <div class="login-panel">
-      <p class="eyebrow">GitHub Pages 独立进度页</p>
+      <p class="kf">Joint Development Progress</p>
       <h1 id="login-title">多面码SDK联合开发专项群</h1>
       <form id="login-form" class="login-form">
-        <label>
-          用户名
-          <input id="username" type="text" autocomplete="username" required>
-        </label>
-        <label>
-          密码
-          <input id="password" type="password" autocomplete="current-password" required>
-        </label>
+        <label>用户名<input id="username" type="text" autocomplete="username" required></label>
+        <label>密码<input id="password" type="password" autocomplete="current-password" required></label>
         <p id="login-error" class="login-error" role="alert"></p>
-        <button id="login-button" type="submit">进入联合开发进度</button>
+        <button id="login-button" class="ac-tab ac-magnetic" data-magnetic="12" type="submit">进入联合开发进度</button>
       </form>
     </div>
   </section>
 
-  <main id="app-shell" class="app-shell is-hidden">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Joint Development Progress</p>
+  <main id="app-shell" class="is-hidden" hidden>
+    <nav class="v2nav" data-scroll-shrink>
+      <a class="brand ac-magnetic" data-magnetic="8" href="#cards">
+        <svg class="ac-eye" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="50" rx="44" ry="28" fill="none" stroke="currentColor" stroke-width="8"/><circle cx="50" cy="50" r="14" fill="currentColor"/><rect class="lid" x="4" y="20" width="92" height="60" rx="28" fill="#efe2c4"/></svg>
+        WISE · 工程化手册
+      </a>
+      <span class="sp"></span>
+      <a class="l ac-magnetic" data-magnetic="10" href="#cards" data-cursor-label="进度">联合开发进度</a>
+      <button id="download-pdf" class="l ac-magnetic" data-magnetic="10" type="button" data-cursor-label="PDF">下载 PDF</button>
+      <button id="logout" class="l ac-magnetic" data-magnetic="10" type="button" data-cursor-label="退出">退出</button>
+    </nav>
+
+    <a class="ac-buddy is-talk" href="#cards" data-cursor-label="Anya" aria-label="阿尼亚助手">
+      <span class="bubble" id="ac-bubble">要拿 Stella！</span>
+      <img class="f f0" src="/static/cloned-assets/spyfamily/anya-1.png" alt="" aria-hidden="true">
+      <img class="f f1" src="/static/cloned-assets/spyfamily/anya-4.png" alt="" aria-hidden="true">
+      <img class="f f2" src="/static/cloned-assets/spyfamily/anya-3.png" alt="" aria-hidden="true">
+    </a>
+
+    <div id="pdf-target">
+      <section class="head">
+        <img class="anya" src="/static/cloned-assets/spyfamily/sec-meeting.png" alt="" aria-hidden="true">
+        <p class="kf">Eden Report</p>
         <h1>多面码SDK联合开发专项群</h1>
-      </div>
-      <div class="actions">
-        <button id="save-local" type="button">保存草稿</button>
-        <button id="download-pdf" type="button" class="primary">下载 PDF</button>
-        <button id="logout" type="button">退出</button>
-      </div>
-    </header>
-
-    <section class="editor-grid">
-      <form id="report-form" class="editor-panel">
-        <label>
-          进度标题
-          <input id="report-title" type="text" value="多面码SDK联合开发专项群联合开发进度">
-        </label>
-        <div class="row">
-          <label>
-            周期
-            <input id="report-period" type="text" placeholder="例如：2026-W27 / 06.29-07.05">
-          </label>
-          <label>
-            负责人
-            <input id="report-owner" type="text" placeholder="填写负责人">
-          </label>
+        <p>每个项目一张成绩单：联合开发进度用 Stella 星点亮，审阅通过盖章放行。</p>
+        <div class="tools">
+          <a class="ac-tab ac-magnetic" data-magnetic="12" data-cursor-label="空状态" href="#cards">当前暂无在册项目</a>
         </div>
-        <label>
-          本周完成
-          <textarea id="done" placeholder="- 填写本周已完成事项"></textarea>
-        </label>
-        <label>
-          风险与阻塞
-          <textarea id="risks" placeholder="- 填写风险、阻塞、需要协调的事项"></textarea>
-        </label>
-        <label>
-          下周计划
-          <textarea id="next" placeholder="- 填写下周计划"></textarea>
-        </label>
-      </form>
+      </section>
 
-      <article id="pdf-target" class="preview-panel">
-        <p class="preview-kicker">多面码SDK联合开发专项群</p>
-        <h2 id="preview-title">多面码SDK联合开发专项群联合开发进度</h2>
-        <dl class="meta-grid">
-          <div><dt>周期</dt><dd id="preview-period">未填写</dd></div>
-          <div><dt>负责人</dt><dd id="preview-owner">未填写</dd></div>
-        </dl>
-        <section>
-          <h3>本周完成</h3>
-          <div id="preview-done" class="markdown-lite empty">未填写</div>
-        </section>
-        <section>
-          <h3>风险与阻塞</h3>
-          <div id="preview-risks" class="markdown-lite empty">未填写</div>
-        </section>
-        <section>
-          <h3>下周计划</h3>
-          <div id="preview-next" class="markdown-lite empty">未填写</div>
-        </section>
-        <footer class="pdf-footer">GitHub Pages 版本 · 与本地 8092 联合开发进度独立更新</footer>
-      </article>
-    </section>
+      <section class="cards" id="cards">
+        <div class="empty">
+          <b>还没有在册项目。</b>
+          GitHub Pages 版内容为空，后续联合开发进度在这里独立维护。
+        </div>
+      </section>
+
+      <section class="pj-extra">
+        <div class="pj-stats">
+          <div class="ac-reveal"><b data-count="0">0</b><span>在册项目</span></div>
+          <div class="ac-reveal"><b data-count="0">0</b><span>累计联合开发进度</span></div>
+          <div class="ac-reveal"><b><span class="ac-star"></span> ∞</b><span>Stella 进度</span></div>
+        </div>
+        <div class="pj-rule">
+          <h2>评分规则 <span class="ac-star"></span></h2>
+          <div class="ac-acc-item">
+            <div class="ac-acc-head" data-acc>完成度（%）是怎么来的？<span class="pl">+</span></div>
+            <div class="ac-acc-body"><div>由 AI 结合项目阶段性/最终目标与历次联合开发进度内容综合评估，给出当前进度百分比，作为参考而非考核。</div></div>
+          </div>
+          <div class="ac-acc-item">
+            <div class="ac-acc-head" data-acc>Stella 星怎么点亮？<span class="pl">+</span></div>
+            <div class="ac-acc-body"><div>每 20% 点亮一颗，共 5 颗；越接近最终目标，金星越多。</div></div>
+          </div>
+          <div class="ac-acc-item">
+            <div class="ac-acc-head" data-acc>盖章代表什么？<span class="pl">+</span></div>
+            <div class="ac-acc-body"><div>完成度 ≥ 80% 的项目会盖上「审阅通过」章，表示阶段性目标基本达成、可以进入下一阶段。</div></div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="v2foot">
+        <b>OPERATION · PLAYBOOK</b> — 多面码SDK联合开发专项群 · 联合开发进度与 Stella 评估，盖章即放行。
+        <span style="float:right">本地时间 <span data-clock>--:--</span></span>
+      </footer>
+    </div>
   </main>
+  <script src="/static/theme/anya-core.js"></script>
 </body>
 </html>

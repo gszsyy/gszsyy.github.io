@@ -124,7 +124,7 @@
   }
 
   function loadPublishApiUrl() {
-    return localStorage.getItem(PUBLISH_API_KEY) || "http://127.0.0.1:8787";
+    return localStorage.getItem(PUBLISH_API_KEY) || "http://10.40.92.74:8787";
   }
 
   function savePublishApiUrl(value) {
@@ -351,22 +351,22 @@
   function publishErrorMessage(error) {
     var message = String(error && error.message || error || "");
     if (message === "Bad credentials") {
-      return "本机后端配置的 GITHUB_TOKEN 无效或已过期。请在 server/.env 中重新配置 Fine-grained personal access token：Repository access 选择 gszsyy.github.io；Contents 权限设置为 Read and write；Metadata 保持 Read-only。";
+      return "发布服务授权已失效。请联系管理员更新发布授权。";
     }
     if (message.indexOf("Resource not accessible by personal access token") >= 0 || message.indexOf("Requires authentication") >= 0) {
-      return "本机后端配置的 GITHUB_TOKEN 权限不足。请确认 token 已选择 gszsyy.github.io 仓库，并给 Contents 设置 Read and write 权限。";
+      return "发布服务权限不足。请联系管理员检查发布授权。";
     }
     if (message.indexOf("Not Found") >= 0) {
-      return "GitHub 仓库或文件未找到。请确认 token 可以访问 gszsyy/gszsyy.github.io，并且仓库已选择到该 token。";
+      return "发布目标未找到。请联系管理员检查发布配置。";
     }
     if (message.indexOf("Failed to fetch") >= 0 || message.indexOf("NetworkError") >= 0 || message.indexOf("Load failed") >= 0) {
-      return "无法连接本机发布后端。请确认 server/publish-server.js 已在你的电脑上运行，发布后端地址正确，例如 http://127.0.0.1:8787。";
+      return "发布服务暂时不可用。请确认发布服务已开启，发布服务地址填写正确，例如 http://10.40.92.74:8787。";
     }
     if (message.indexOf("发布密码不正确") >= 0) {
-      return "发布密码不正确。请填写本机后端 server/.env 中的 PUBLISH_PASSWORD。";
+      return "发布密码不正确。请向管理员确认最新发布密码。";
     }
     if (message.indexOf("后端未配置 GITHUB_TOKEN") >= 0) {
-      return "本机后端未配置 GITHUB_TOKEN。请在 server/.env 中配置有 Contents 读写权限的 GitHub Token，并重启后端服务。";
+      return "发布服务尚未完成授权配置。请联系管理员处理。";
     }
     return message || "未知错误";
   }
@@ -421,7 +421,7 @@
       return;
     }
     if (!publishPassword()) {
-      setPublishStatus("请输入发布密码。发布密码配置在你电脑本机后端的 server/.env 中。", true);
+      setPublishStatus("请输入发布密码。", true);
       return;
     }
     var originalText = reviewPublishButton ? reviewPublishButton.textContent : "";
@@ -691,7 +691,7 @@
   if (publishApiUrlInput) {
     publishApiUrlInput.value = loadPublishApiUrl();
     publishApiUrlInput.addEventListener("change", function () {
-      savePublishApiUrl(publishApiUrlInput.value.trim() || "http://127.0.0.1:8787");
+      savePublishApiUrl(publishApiUrlInput.value.trim() || "http://10.40.92.74:8787");
     });
   }
 

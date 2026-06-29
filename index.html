@@ -92,7 +92,7 @@
     @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}.form-row,.detail-grid{grid-template-columns:1fr}}
     @media print{.v2nav,.ac-buddy,.tools,.login-screen{display:none!important}.head{padding-top:36px}.cards{padding-bottom:30px}}
   </style>
-  <script defer src="/assets/app.js?v=20260629-v9-local-backend"></script>
+  <script defer src="/assets/app.js?v=20260629-v10-publish-service"></script>
 </head>
 <body class="ac-root">
   <div class="bg" aria-hidden="true"></div>
@@ -186,9 +186,9 @@
           </div>
           <label>审核发布用 JSON<textarea id="local-project-json" class="review-json" readonly></textarea></label>
           <div class="publish-panel">
-            <label>本机发布后端地址<input id="publish-api-url" type="url" autocomplete="off" value="http://127.0.0.1:8787" placeholder="http://127.0.0.1:8787"></label>
-            <label>发布密码<input id="publish-password" type="password" autocomplete="off" placeholder="填写本机后端 server/.env 中的 PUBLISH_PASSWORD"></label>
-            <div class="publish-status">GitHub Token 已放在你电脑上的本机后端服务中。网页只调用本机后端，不会保存或暴露 GitHub Token。</div>
+            <label>发布服务地址<input id="publish-api-url" type="url" autocomplete="off" value="http://10.40.92.74:8787" placeholder="http://10.40.92.74:8787"></label>
+            <label>发布密码<input id="publish-password" type="password" autocomplete="off" placeholder="向管理员获取发布密码"></label>
+            <div class="publish-status">发布授权已由固定服务托管。使用者只需要填写发布密码并点击审核发布。</div>
             <div class="form-actions">
               <button id="review-publish-project" class="ac-tab ac-magnetic" data-magnetic="12" type="button">审核发布</button>
             </div>
@@ -196,7 +196,7 @@
           </div>
           <div class="detail-block">
             <b>审核进入托管清单流程</b>
-            <div>点击“审核发布”后会自动完成：检查内容完整性、创建 /projects/项目ID/ 页面、更新 assets/projects.json、提交到 GitHub Pages 仓库。GitHub Pages 构建完成后，其他设备会从托管清单同步看到该项目卡片。</div>
+            <div>点击“审核发布”后会自动完成内容检查、项目页面生成、项目清单更新和线上发布。发布完成后，其他设备刷新页面即可看到项目卡片。</div>
           </div>
           <div class="form-actions">
             <button id="copy-project-json" class="ac-tab ac-magnetic" data-magnetic="12" type="button">复制审核 JSON</button>

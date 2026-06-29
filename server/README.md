@@ -9,7 +9,7 @@
 创建 `server/.env`：
 
 ```bash
-HOST=127.0.0.1
+HOST=0.0.0.0
 PORT=8787
 GITHUB_OWNER=gszsyy
 GITHUB_REPO=gszsyy.github.io
@@ -58,7 +58,7 @@ loginctl enable-linger "$USER"
 
 项目详情页里填：
 
-- 发布后端地址：`http://127.0.0.1:8787`
+- 发布服务地址：`http://10.40.92.74:8787`
 - 发布密码：`server/.env` 中的 `PUBLISH_PASSWORD`
 
 点击“审核发布”后，后端会自动：

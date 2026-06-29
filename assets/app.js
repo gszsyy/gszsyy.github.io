@@ -10,6 +10,7 @@
   var loginScreen = document.getElementById("login-screen");
   var appShell = document.getElementById("app-shell");
   var loginForm = document.getElementById("login-form");
+  var loginButton = document.getElementById("login-button");
   var loginError = document.getElementById("login-error");
 
   var fields = {
@@ -110,18 +111,21 @@
 
   function showApp() {
     loginScreen.hidden = true;
+    loginScreen.classList.add("is-hidden");
     appShell.hidden = false;
+    appShell.classList.remove("is-hidden");
     loadDraft();
     updatePreview();
   }
 
   function showLogin() {
     loginScreen.hidden = false;
+    loginScreen.classList.remove("is-hidden");
     appShell.hidden = true;
+    appShell.classList.add("is-hidden");
   }
 
-  loginForm.addEventListener("submit", function (event) {
-    event.preventDefault();
+  function attemptLogin() {
     var user = document.getElementById("username").value.trim();
     var pass = document.getElementById("password").value;
     if (user === USERNAME && pass === PASSWORD) {
@@ -131,6 +135,16 @@
       return;
     }
     loginError.textContent = "用户名或密码不正确。";
+  }
+
+  loginForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    attemptLogin();
+  });
+
+  loginButton.addEventListener("click", function (event) {
+    event.preventDefault();
+    attemptLogin();
   });
 
   Object.keys(fields).forEach(function (key) {

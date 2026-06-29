@@ -134,6 +134,10 @@ textarea {
   padding: 1.2rem;
 }
 
+.is-hidden {
+  display: none !important;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;

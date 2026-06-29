@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>多面码SDK联合开发专项群</title>
   <link rel="stylesheet" href="assets/site.css">
-  <script defer src="assets/app.js"></script>
+  <script defer src="assets/app.js?v=20260629-login-fix"></script>
 </head>
 <body>
   <section id="login-screen" class="login-screen" aria-labelledby="login-title">
@@ -22,12 +22,12 @@
           <input id="password" type="password" autocomplete="current-password" required>
         </label>
         <p id="login-error" class="login-error" role="alert"></p>
-        <button type="submit">进入联合开发进度</button>
+        <button id="login-button" type="submit">进入联合开发进度</button>
       </form>
     </div>
   </section>
 
-  <main id="app-shell" class="app-shell" hidden>
+  <main id="app-shell" class="app-shell is-hidden">
     <header class="topbar">
       <div>
         <p class="eyebrow">Joint Development Progress</p>

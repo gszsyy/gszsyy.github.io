@@ -33,7 +33,7 @@
     .diagram{width:100%;overflow:auto;border:1px dashed rgba(201,162,74,.75);border-radius:10px;background:#fff8d8;padding:14px;box-sizing:border-box}
     svg text{font-family:Arial,"Microsoft YaHei",sans-serif}.box{fill:#fffdf3;stroke:#c9a24a;stroke-width:2}.arrow{stroke:#0b6b57;stroke-width:2.6;marker-end:url(#arrow);fill:none}.node{fill:#0b6b57}.warn{fill:#c8587b}.line{stroke:#6c5b37;stroke-width:2;fill:none}.label{font-size:15px;fill:#172033}.small{font-size:12px;fill:#6c5b37}
     .media-frame{background:#efe2c4;border-radius:12px;overflow:hidden;border:2px solid var(--gold);aspect-ratio:1280/460}.media-frame object{display:block;width:100%;height:100%;background:#efe2c4}
-    .model-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.model-card{border:1px dashed rgba(201,162,74,.75);border-radius:10px;background:#fff8d8;padding:14px}.model-card canvas{display:block;width:100%;aspect-ratio:1/1;border-radius:8px;background:linear-gradient(180deg,#efe2c4,#fffdf3);border:1px solid rgba(201,162,74,.65)}.model-card h3{margin-top:10px}.model-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.model-links a{font-size:13px;color:var(--green);font-family:var(--display-bold)}
+    .model-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.model-card{border:1px dashed rgba(201,162,74,.75);border-radius:10px;background:#fff8d8;padding:14px}.model-card canvas{display:block;width:100%;aspect-ratio:1/1;border-radius:8px;background:linear-gradient(180deg,#efe2c4,#fffdf3);border:1px solid rgba(201,162,74,.65)}.model-card h3{margin-top:10px}.model-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.model-links a{font-size:13px;color:var(--green);font-family:var(--display-bold)}.model-status{font-size:13px;color:var(--amber);font-family:var(--display-bold);min-height:22px;margin-top:8px}
     .table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid rgba(201,162,74,.55);padding:10px;text-align:left;vertical-align:top}.table th{color:var(--green);font-family:var(--display-bold);background:rgba(11,107,87,.08)}.table td:first-child{color:var(--blue);font-family:var(--display-bold)}.table td:last-child{color:var(--rose);font-family:var(--display-bold)}
     .stamp{display:inline-block;border:2px solid var(--pink);color:var(--pink);font-family:var(--poster);padding:5px 10px;transform:rotate(-4deg);margin-left:8px}
     .answer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -124,12 +124,14 @@
       <div class="model-grid">
         <div class="model-card">
           <canvas data-model="/assets/projects/apriltag-unity-pose/structure.stl" aria-label="第一代 STL 结构模型预览"></canvas>
+          <div class="model-status">正在加载预览...</div>
           <h3>第一代 STL（4.stl）</h3>
           <p class="muted">用于展示第一代载体基础外形和初始面布局。</p>
           <div class="model-links"><a href="/assets/projects/apriltag-unity-pose/structure.stl" download>下载 STL</a></div>
         </div>
         <div class="model-card">
-          <canvas data-model="/assets/projects/apriltag-unity-pose/structure-v2.stl" aria-label="第二代 STL 结构模型预览"></canvas>
+          <canvas data-model="/assets/projects/apriltag-unity-pose/structure-v2-preview.stl" aria-label="第二代 STL 结构模型预览"></canvas>
+          <div class="model-status">正在加载预览...</div>
           <h3>第二代 STL（2.stl）</h3>
           <p class="muted">用于展示第二代结构外形和多面体贴标空间。</p>
           <div class="model-links"><a href="/assets/projects/apriltag-unity-pose/structure-v2.stl" download>下载 STL</a></div>
@@ -210,6 +212,7 @@
       function parseBinaryStl(buffer) {
         var view = new DataView(buffer);
         var count = view.getUint32(80, true);
+        if (buffer.byteLength !== 84 + count * 50) throw new Error("STL 文件长度与三角面数量不一致");
         var triangles = [];
         var stride = Math.max(1, Math.ceil(count / 9000));
         var offset = 84;
@@ -281,12 +284,17 @@
         requestAnimationFrame(function () { draw(canvas, model, start); });
       }
       document.querySelectorAll("canvas[data-model]").forEach(function (canvas) {
+        var status = canvas.parentElement.querySelector(".model-status");
         fetch(canvas.dataset.model).then(function (response) {
+          if (!response.ok) throw new Error("HTTP " + response.status);
           return response.arrayBuffer();
         }).then(function (data) {
           var model = parseBinaryStl(data);
+          if (!model.triangles.length) throw new Error("没有可绘制三角面");
+          if (status) status.textContent = "预览已加载，可旋转显示";
           draw(canvas, normalize(model), Date.now());
-        }).catch(function () {
+        }).catch(function (error) {
+          if (status) status.textContent = "模型预览加载失败：" + error.message;
           var ctx = canvas.getContext("2d"); fitCanvas(canvas); ctx.fillText("模型预览加载失败", 20, 40);
         });
       });

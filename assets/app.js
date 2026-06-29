@@ -7,6 +7,7 @@
   var DRAFT_KEY = "duomianma-sdk-weekly-draft-v1";
   var PROJECTS_KEY = "duomianma-sdk-projects-v1";
   var DEFAULT_PUBLISH_API_URL = "http://10.40.92.74:8787";
+  var AUTO_PUBLISH_PREFIX = "#auto-publish=";
   var PROJECTS_MANIFEST = "/assets/projects.json?v=20260629-published-projects";
   var GITHUB_OWNER = "gszsyy";
   var GITHUB_REPO = "gszsyy.github.io";
@@ -123,8 +124,34 @@
     localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
   }
 
+  function saveOrReplaceLocalProject(project) {
+    var projects = loadProjects().filter(function (item) {
+      return item.id !== project.id;
+    });
+    projects.unshift(project);
+    saveProjects(projects);
+  }
+
   function loadPublishApiUrl() {
     return DEFAULT_PUBLISH_API_URL;
+  }
+
+  function isLocalPublishPage() {
+    return window.location.origin === DEFAULT_PUBLISH_API_URL;
+  }
+
+  function localPublishUrlFor(project) {
+    return DEFAULT_PUBLISH_API_URL + "/" + AUTO_PUBLISH_PREFIX + encodeURIComponent(JSON.stringify(project));
+  }
+
+  function autoPublishProjectFromHash() {
+    if (location.hash.indexOf(AUTO_PUBLISH_PREFIX) !== 0) return null;
+    try {
+      return JSON.parse(decodeURIComponent(location.hash.slice(AUTO_PUBLISH_PREFIX.length)));
+    } catch (error) {
+      console.warn("auto publish payload failed", error);
+      return null;
+    }
   }
 
   function setPublishStatus(message, isError) {
@@ -376,6 +403,41 @@
     return value.replace(/\/+$/, "");
   }
 
+  async function publishProjectDraft(project, removeAfterPublish) {
+    var missing = validateProjectForPublish(project);
+    if (missing.length) {
+      setPublishStatus("审核未通过：请补全 " + missing.join("、") + "。", true);
+      return;
+    }
+    if (!isLocalPublishPage()) {
+      setPublishStatus("正在切换到本机发布服务并继续发布...");
+      window.location.href = localPublishUrlFor(project);
+      return;
+    }
+    var originalText = reviewPublishButton ? reviewPublishButton.textContent : "";
+    if (reviewPublishButton) {
+      reviewPublishButton.disabled = true;
+      reviewPublishButton.textContent = "正在审核发布";
+    }
+    try {
+      setPublishStatus("正在审核并发布...");
+      await publishViaBackend(project);
+      setPublishStatus("发布提交完成。GitHub Pages 构建完成后，其他设备会显示该项目。");
+      if (removeAfterPublish) removeLocalProject(project.id);
+      await loadPublishedProjects();
+      renderProjects();
+      location.hash = "#cards";
+      syncRoute();
+    } catch (error) {
+      setPublishStatus("审核发布失败：" + publishErrorMessage(error), true);
+    } finally {
+      if (reviewPublishButton) {
+        reviewPublishButton.disabled = false;
+        reviewPublishButton.textContent = originalText || "审核发布";
+      }
+    }
+  }
+
   async function publishViaBackend(project) {
     var apiUrl = publishBackendUrl();
     var response = await fetch(apiUrl + "/api/publish-project", {
@@ -398,33 +460,7 @@
       setPublishStatus("没有找到本机草稿项目。", true);
       return;
     }
-    var missing = validateProjectForPublish(project);
-    if (missing.length) {
-      setPublishStatus("审核未通过：请补全 " + missing.join("、") + "。", true);
-      return;
-    }
-    var originalText = reviewPublishButton ? reviewPublishButton.textContent : "";
-    if (reviewPublishButton) {
-      reviewPublishButton.disabled = true;
-      reviewPublishButton.textContent = "正在审核发布";
-    }
-    try {
-      setPublishStatus("正在审核并发布...");
-      await publishViaBackend(project);
-      setPublishStatus("发布提交完成。GitHub Pages 构建完成后，其他设备会显示该项目。");
-      removeLocalProject(project.id);
-      await loadPublishedProjects();
-      renderProjects();
-      location.hash = "#cards";
-      syncRoute();
-    } catch (error) {
-      setPublishStatus("审核发布失败：" + publishErrorMessage(error), true);
-    } finally {
-      if (reviewPublishButton) {
-        reviewPublishButton.disabled = false;
-        reviewPublishButton.textContent = originalText || "审核发布";
-      }
-    }
+    await publishProjectDraft(project, true);
   }
 
   function findLocalProject(id) {
@@ -672,6 +708,17 @@
 
   window.addEventListener("hashchange", syncRoute);
 
+  function handleAutoPublishRoute() {
+    var project = autoPublishProjectFromHash();
+    if (!project) return false;
+    sessionStorage.setItem(AUTH_KEY, "1");
+    saveOrReplaceLocalProject(project);
+    showApp();
+    showLocalProjectDetail(project.id);
+    publishProjectDraft(project, true);
+    return true;
+  }
+
   var downloadPdfButton = document.getElementById("download-pdf");
   if (downloadPdfButton) downloadPdfButton.addEventListener("click", async function () {
     saveDraft();
@@ -713,6 +760,10 @@
 
     window.print();
   });
+
+  if (handleAutoPublishRoute()) {
+    return;
+  }
 
   if (sessionStorage.getItem(AUTH_KEY) === "1") {
     showApp();

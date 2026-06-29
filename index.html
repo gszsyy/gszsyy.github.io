@@ -5,16 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>多面码SDK联合开发专项群</title>
   <link rel="stylesheet" href="assets/site.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script defer src="assets/app.js"></script>
 </head>
 <body>
   <section id="login-screen" class="login-screen" aria-labelledby="login-title">
     <div class="login-panel">
-      <p class="eyebrow">GitHub Pages 独立周报</p>
+      <p class="eyebrow">GitHub Pages 独立进度页</p>
       <h1 id="login-title">多面码SDK联合开发专项群</h1>
-      <p class="login-note">请输入访问账号。该页面和本地 8092 周报内容独立维护。</p>
       <form id="login-form" class="login-form">
         <label>
           用户名
@@ -25,7 +22,7 @@
           <input id="password" type="password" autocomplete="current-password" required>
         </label>
         <p id="login-error" class="login-error" role="alert"></p>
-        <button type="submit">进入周报</button>
+        <button type="submit">进入联合开发进度</button>
       </form>
     </div>
   </section>
@@ -33,7 +30,7 @@
   <main id="app-shell" class="app-shell" hidden>
     <header class="topbar">
       <div>
-        <p class="eyebrow">Weekly Report</p>
+        <p class="eyebrow">Joint Development Progress</p>
         <h1>多面码SDK联合开发专项群</h1>
       </div>
       <div class="actions">
@@ -46,8 +43,8 @@
     <section class="editor-grid">
       <form id="report-form" class="editor-panel">
         <label>
-          周报标题
-          <input id="report-title" type="text" value="多面码SDK联合开发专项群周报">
+          进度标题
+          <input id="report-title" type="text" value="多面码SDK联合开发专项群联合开发进度">
         </label>
         <div class="row">
           <label>
@@ -75,7 +72,7 @@
 
       <article id="pdf-target" class="preview-panel">
         <p class="preview-kicker">多面码SDK联合开发专项群</p>
-        <h2 id="preview-title">多面码SDK联合开发专项群周报</h2>
+        <h2 id="preview-title">多面码SDK联合开发专项群联合开发进度</h2>
         <dl class="meta-grid">
           <div><dt>周期</dt><dd id="preview-period">未填写</dd></div>
           <div><dt>负责人</dt><dd id="preview-owner">未填写</dd></div>
@@ -92,7 +89,7 @@
           <h3>下周计划</h3>
           <div id="preview-next" class="markdown-lite empty">未填写</div>
         </section>
-        <footer class="pdf-footer">GitHub Pages 版本 · 与本地 8092 周报独立更新</footer>
+        <footer class="pdf-footer">GitHub Pages 版本 · 与本地 8092 联合开发进度独立更新</footer>
       </article>
     </section>
   </main>

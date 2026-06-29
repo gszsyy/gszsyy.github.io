@@ -5,6 +5,7 @@
   var PASSWORD = "gszsyy1234";
   var AUTH_KEY = "duomianma-sdk-weekly-auth";
   var DRAFT_KEY = "duomianma-sdk-weekly-draft-v1";
+  var scriptLoads = {};
 
   var loginScreen = document.getElementById("login-screen");
   var appShell = document.getElementById("app-shell");
@@ -76,6 +77,37 @@
     }
   }
 
+  function loadScriptOnce(src) {
+    if (scriptLoads[src]) return scriptLoads[src];
+    scriptLoads[src] = new Promise(function (resolve, reject) {
+      var existing = document.querySelector('script[src="' + src + '"]');
+      if (existing) {
+        existing.addEventListener("load", resolve, { once: true });
+        existing.addEventListener("error", reject, { once: true });
+        return;
+      }
+      var script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+    return scriptLoads[src];
+  }
+
+  async function ensurePdfLibraries() {
+    if (window.jspdf && window.html2canvas) return true;
+    try {
+      await loadScriptOnce("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js");
+      await loadScriptOnce("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js");
+      return Boolean(window.jspdf && window.html2canvas);
+    } catch (error) {
+      console.warn("pdf libraries failed to load", error);
+      return false;
+    }
+  }
+
   function showApp() {
     loginScreen.hidden = true;
     appShell.hidden = false;
@@ -122,27 +154,38 @@
 
   document.getElementById("download-pdf").addEventListener("click", async function () {
     saveDraft();
+    var button = this;
+    var originalText = button.textContent;
+    button.textContent = "正在生成 PDF";
+    button.disabled = true;
     var target = document.getElementById("pdf-target");
     var filename = (textOrDefault(fields.period.value) + "-" + textOrDefault(fields.title.value))
       .replace(/[\\/:*?"<>|]+/g, "-") + ".pdf";
 
-    if (window.jspdf && window.html2canvas) {
-      var canvas = await window.html2canvas(target, { scale: 2, backgroundColor: "#ffffff" });
-      var imgData = canvas.toDataURL("image/png");
-      var pdf = new window.jspdf.jsPDF("p", "mm", "a4");
-      var pageWidth = pdf.internal.pageSize.getWidth();
-      var pageHeight = pdf.internal.pageSize.getHeight();
-      var imgWidth = pageWidth;
-      var imgHeight = canvas.height * imgWidth / canvas.width;
-      var y = 0;
-      pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
-      while (imgHeight + y > pageHeight) {
-        y -= pageHeight;
-        pdf.addPage();
+    try {
+      if (await ensurePdfLibraries()) {
+        var canvas = await window.html2canvas(target, { scale: 2, backgroundColor: "#ffffff" });
+        var imgData = canvas.toDataURL("image/png");
+        var pdf = new window.jspdf.jsPDF("p", "mm", "a4");
+        var pageWidth = pdf.internal.pageSize.getWidth();
+        var pageHeight = pdf.internal.pageSize.getHeight();
+        var imgWidth = pageWidth;
+        var imgHeight = canvas.height * imgWidth / canvas.width;
+        var y = 0;
         pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
+        while (imgHeight + y > pageHeight) {
+          y -= pageHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
+        }
+        pdf.save(filename);
+        return;
       }
-      pdf.save(filename);
-      return;
+    } catch (error) {
+      console.warn("pdf generation failed", error);
+    } finally {
+      button.textContent = originalText;
+      button.disabled = false;
     }
 
     window.print();

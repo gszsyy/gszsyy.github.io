@@ -128,7 +128,7 @@
     var intro = project.intro || "暂无简介。";
     var url = project.url || ("#project-" + project.id);
     return [
-      '<a class="report ac-reveal" data-cursor-label="View" href="' + escapeHtml(url) + '" id="project-' + escapeHtml(project.id) + '">',
+      '<a class="report ac-reveal" href="' + escapeHtml(url) + '" id="project-' + escapeHtml(project.id) + '">',
       '<img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">',
       '<div class="label">EDEN ACADEMY · REPORT CARD</div>',
       '<h3>' + escapeHtml(project.name) + '</h3>',

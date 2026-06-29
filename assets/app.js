@@ -10,7 +10,7 @@
   var loginScreen = document.getElementById("login-screen");
   var appShell = document.getElementById("app-shell");
   var loginForm = document.getElementById("login-form");
-  var loginButton = document.getElementById("login-button");
+  var loginButton = document.getElementById("login-button") || (loginForm && loginForm.querySelector("button[type=submit]"));
   var loginError = document.getElementById("login-error");
 
   var fields = {
@@ -36,12 +36,14 @@
   }
 
   function renderBlock(target, value) {
+    if (!target) return;
     var text = textOrDefault(value);
     target.textContent = text;
     target.classList.toggle("empty", text === "未填写");
   }
 
   function updatePreview() {
+    if (!preview.title || !preview.period || !preview.owner) return;
     preview.title.textContent = textOrDefault(fields.title.value);
     preview.period.textContent = textOrDefault(fields.period.value);
     preview.owner.textContent = textOrDefault(fields.owner.value);
@@ -110,19 +112,31 @@
   }
 
   function showApp() {
-    loginScreen.hidden = true;
-    loginScreen.classList.add("is-hidden");
-    appShell.hidden = false;
-    appShell.classList.remove("is-hidden");
+    if (loginScreen) {
+      loginScreen.hidden = true;
+      loginScreen.classList.add("is-hidden");
+      loginScreen.style.display = "none";
+    }
+    if (appShell) {
+      appShell.hidden = false;
+      appShell.classList.remove("is-hidden");
+      appShell.style.display = "";
+    }
     loadDraft();
     updatePreview();
   }
 
   function showLogin() {
-    loginScreen.hidden = false;
-    loginScreen.classList.remove("is-hidden");
-    appShell.hidden = true;
-    appShell.classList.add("is-hidden");
+    if (loginScreen) {
+      loginScreen.hidden = false;
+      loginScreen.classList.remove("is-hidden");
+      loginScreen.style.display = "";
+    }
+    if (appShell) {
+      appShell.hidden = true;
+      appShell.classList.add("is-hidden");
+      appShell.style.display = "none";
+    }
   }
 
   function attemptLogin() {
@@ -130,43 +144,51 @@
     var pass = document.getElementById("password").value;
     if (user === USERNAME && pass === PASSWORD) {
       sessionStorage.setItem(AUTH_KEY, "1");
-      loginError.textContent = "";
+      if (loginError) loginError.textContent = "";
       showApp();
       return;
     }
-    loginError.textContent = "用户名或密码不正确。";
+    if (loginError) loginError.textContent = "用户名或密码不正确。";
   }
 
-  loginForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-    attemptLogin();
-  });
+  if (loginForm) {
+    loginForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      attemptLogin();
+    });
+  }
 
-  loginButton.addEventListener("click", function (event) {
-    event.preventDefault();
-    attemptLogin();
-  });
+  if (loginButton) {
+    loginButton.addEventListener("click", function (event) {
+      event.preventDefault();
+      attemptLogin();
+    });
+  }
 
   Object.keys(fields).forEach(function (key) {
+    if (!fields[key]) return;
     fields[key].addEventListener("input", function () {
       updatePreview();
       saveDraft();
     });
   });
 
-  document.getElementById("save-local").addEventListener("click", function () {
+  var saveLocalButton = document.getElementById("save-local");
+  if (saveLocalButton) saveLocalButton.addEventListener("click", function () {
     saveDraft();
     this.textContent = "已保存";
     var button = this;
     setTimeout(function () { button.textContent = "保存草稿"; }, 1200);
   });
 
-  document.getElementById("logout").addEventListener("click", function () {
+  var logoutButton = document.getElementById("logout");
+  if (logoutButton) logoutButton.addEventListener("click", function () {
     sessionStorage.removeItem(AUTH_KEY);
     showLogin();
   });
 
-  document.getElementById("download-pdf").addEventListener("click", async function () {
+  var downloadPdfButton = document.getElementById("download-pdf");
+  if (downloadPdfButton) downloadPdfButton.addEventListener("click", async function () {
     saveDraft();
     var button = this;
     var originalText = button.textContent;

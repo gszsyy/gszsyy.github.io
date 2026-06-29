@@ -360,10 +360,7 @@
       return "发布目标未找到。请联系管理员检查发布配置。";
     }
     if (message.indexOf("Failed to fetch") >= 0 || message.indexOf("NetworkError") >= 0 || message.indexOf("Load failed") >= 0) {
-      return "发布服务暂时不可用。请确认发布服务已开启，发布服务地址填写正确，例如 http://10.40.92.74:8787。";
-    }
-    if (message.indexOf("发布密码不正确") >= 0) {
-      return "发布密码不正确。请向管理员确认最新发布密码。";
+      return "发布服务暂时不可用。请联系管理员确认发布服务正在运行。";
     }
     if (message.indexOf("后端未配置 GITHUB_TOKEN") >= 0) {
       return "发布服务尚未完成授权配置。请联系管理员处理。";
@@ -383,21 +380,13 @@
     return value.replace(/\/+$/, "");
   }
 
-  function publishPassword() {
-    var input = document.getElementById("publish-password");
-    return input ? input.value : "";
-  }
-
   async function publishViaBackend(project) {
     var apiUrl = publishBackendUrl();
     savePublishApiUrl(apiUrl);
     var response = await fetch(apiUrl + "/api/publish-project", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        password: publishPassword(),
-        project: project
-      })
+      body: JSON.stringify({ project: project })
     });
     var data = await response.json().catch(function () {
       return {};
@@ -410,7 +399,6 @@
 
   async function publishLocalProject(id) {
     var project = findLocalProject(id);
-    var passwordInput = document.getElementById("publish-password");
     if (!project) {
       setPublishStatus("没有找到本机草稿项目。", true);
       return;
@@ -420,17 +408,13 @@
       setPublishStatus("审核未通过：请补全 " + missing.join("、") + "。", true);
       return;
     }
-    if (!publishPassword()) {
-      setPublishStatus("请输入发布密码。", true);
-      return;
-    }
     var originalText = reviewPublishButton ? reviewPublishButton.textContent : "";
     if (reviewPublishButton) {
       reviewPublishButton.disabled = true;
       reviewPublishButton.textContent = "正在审核发布";
     }
     try {
-      setPublishStatus("正在调用本机发布后端...");
+      setPublishStatus("正在审核并发布...");
       await publishViaBackend(project);
       setPublishStatus("发布提交完成。GitHub Pages 构建完成后，其他设备会显示该项目。");
       removeLocalProject(project.id);
@@ -445,7 +429,6 @@
         reviewPublishButton.disabled = false;
         reviewPublishButton.textContent = originalText || "审核发布";
       }
-      if (passwordInput) passwordInput.value = "";
     }
   }
 

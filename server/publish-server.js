@@ -12,8 +12,22 @@ const GITHUB_OWNER = process.env.GITHUB_OWNER || "gszsyy";
 const GITHUB_REPO = process.env.GITHUB_REPO || "gszsyy.github.io";
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH || "main";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
-const PUBLISH_PASSWORD = process.env.PUBLISH_PASSWORD || "";
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
+const MIME_TYPES = {
+  ".css": "text/css; charset=utf-8",
+  ".glb": "model/gltf-binary",
+  ".gltf": "model/gltf+json",
+  ".html": "text/html; charset=utf-8",
+  ".ico": "image/x-icon",
+  ".jpeg": "image/jpeg",
+  ".jpg": "image/jpeg",
+  ".js": "application/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".mp4": "video/mp4",
+  ".png": "image/png",
+  ".svg": "image/svg+xml",
+  ".webm": "video/webm",
+};
 
 function readEnvFile() {
   const envPath = path.join(__dirname, ".env");
@@ -40,7 +54,6 @@ function config() {
     repo: process.env.GITHUB_REPO || GITHUB_REPO,
     branch: process.env.GITHUB_BRANCH || GITHUB_BRANCH,
     token: process.env.GITHUB_TOKEN || GITHUB_TOKEN,
-    publishPassword: process.env.PUBLISH_PASSWORD || PUBLISH_PASSWORD,
     allowedOrigin: process.env.ALLOWED_ORIGIN || ALLOWED_ORIGIN,
   };
 }
@@ -63,6 +76,46 @@ function sendJson(req, res, status, payload) {
     ...corsHeaders(req),
   });
   res.end(JSON.stringify(payload));
+}
+
+function sendStatic(req, res, filepath) {
+  const ext = path.extname(filepath).toLowerCase();
+  res.writeHead(200, {
+    "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
+    ...corsHeaders(req),
+  });
+  fs.createReadStream(filepath).pipe(res);
+}
+
+function staticPathFromUrl(urlValue) {
+  const requestUrl = new URL(urlValue, "http://localhost");
+  let pathname = decodeURIComponent(requestUrl.pathname);
+  if (pathname.endsWith("/")) pathname += "index.html";
+  const filepath = path.resolve(ROOT, `.${pathname}`);
+  if (!filepath.startsWith(`${ROOT}${path.sep}`)) return null;
+  return filepath;
+}
+
+function serveStatic(req, res) {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    sendJson(req, res, 404, { ok: false, error: "Not Found" });
+    return;
+  }
+  const filepath = staticPathFromUrl(req.url || "/");
+  if (!filepath || !fs.existsSync(filepath) || fs.statSync(filepath).isDirectory()) {
+    sendJson(req, res, 404, { ok: false, error: "Not Found" });
+    return;
+  }
+  if (req.method === "HEAD") {
+    const ext = path.extname(filepath).toLowerCase();
+    res.writeHead(200, {
+      "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
+      ...corsHeaders(req),
+    });
+    res.end();
+    return;
+  }
+  sendStatic(req, res, filepath);
 }
 
 function readJson(req) {
@@ -237,12 +290,7 @@ async function publishProject(project) {
 }
 
 async function handlePublish(req, res) {
-  const cfg = config();
   const body = await readJson(req);
-  if (cfg.publishPassword && body.password !== cfg.publishPassword) {
-    sendJson(req, res, 403, { ok: false, error: "发布密码不正确" });
-    return;
-  }
   const entry = await publishProject(body.project || {});
   sendJson(req, res, 200, { ok: true, project: entry });
 }
@@ -262,7 +310,7 @@ const server = http.createServer(async (req, res) => {
       await handlePublish(req, res);
       return;
     }
-    sendJson(req, res, 404, { ok: false, error: "Not Found" });
+    serveStatic(req, res);
   } catch (error) {
     sendJson(req, res, 500, { ok: false, error: error.message || String(error) });
   }

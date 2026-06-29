@@ -92,7 +92,7 @@
     @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}.form-row,.detail-grid{grid-template-columns:1fr}}
     @media print{.v2nav,.ac-buddy,.tools,.login-screen{display:none!important}.head{padding-top:36px}.cards{padding-bottom:30px}}
   </style>
-  <script defer src="/assets/app.js?v=20260629-v10-publish-service"></script>
+  <script defer src="/assets/app.js?v=20260629-v11-one-click-publish"></script>
 </head>
 <body class="ac-root">
   <div class="bg" aria-hidden="true"></div>
@@ -186,9 +186,7 @@
           </div>
           <label>审核发布用 JSON<textarea id="local-project-json" class="review-json" readonly></textarea></label>
           <div class="publish-panel">
-            <label>发布服务地址<input id="publish-api-url" type="url" autocomplete="off" value="http://10.40.92.74:8787" placeholder="http://10.40.92.74:8787"></label>
-            <label>发布密码<input id="publish-password" type="password" autocomplete="off" placeholder="向管理员获取发布密码"></label>
-            <div class="publish-status">发布授权已由固定服务托管。使用者只需要填写发布密码并点击审核发布。</div>
+            <div class="publish-status">发布服务已连接。点击审核发布后会自动检查内容、生成项目页面并同步到线上。</div>
             <div class="form-actions">
               <button id="review-publish-project" class="ac-tab ac-magnetic" data-magnetic="12" type="button">审核发布</button>
             </div>

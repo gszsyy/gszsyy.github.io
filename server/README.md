@@ -15,7 +15,6 @@ GITHUB_OWNER=gszsyy
 GITHUB_REPO=gszsyy.github.io
 GITHUB_BRANCH=main
 GITHUB_TOKEN=你的 GitHub fine-grained token
-PUBLISH_PASSWORD=你设置的发布密码
 ALLOWED_ORIGIN=https://gszsyy.github.io
 ```
 
@@ -56,10 +55,13 @@ loginctl enable-linger "$USER"
 
 ## 4. 前端使用
 
-项目详情页里填：
+项目详情页不需要填写发布地址或发布密码。打开项目草稿详情页后，直接点击“审核发布”。
 
-- 发布服务地址：`http://10.40.92.74:8787`
-- 发布密码：`server/.env` 中的 `PUBLISH_PASSWORD`
+如果浏览器限制 GitHub Pages 调用内网发布服务，也可以使用本机发布服务提供的同源入口：
+
+```text
+http://10.40.92.74:8787/
+```
 
 点击“审核发布”后，后端会自动：
 

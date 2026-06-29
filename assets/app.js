@@ -6,7 +6,7 @@
   var AUTH_KEY = "duomianma-sdk-weekly-auth";
   var DRAFT_KEY = "duomianma-sdk-weekly-draft-v1";
   var PROJECTS_KEY = "duomianma-sdk-projects-v1";
-  var PUBLISH_API_KEY = "duomianma-sdk-publish-api-url";
+  var DEFAULT_PUBLISH_API_URL = "http://10.40.92.74:8787";
   var PROJECTS_MANIFEST = "/assets/projects.json?v=20260629-published-projects";
   var GITHUB_OWNER = "gszsyy";
   var GITHUB_REPO = "gszsyy.github.io";
@@ -124,11 +124,7 @@
   }
 
   function loadPublishApiUrl() {
-    return localStorage.getItem(PUBLISH_API_KEY) || "http://10.40.92.74:8787";
-  }
-
-  function savePublishApiUrl(value) {
-    localStorage.setItem(PUBLISH_API_KEY, value);
+    return DEFAULT_PUBLISH_API_URL;
   }
 
   function setPublishStatus(message, isError) {
@@ -382,7 +378,6 @@
 
   async function publishViaBackend(project) {
     var apiUrl = publishBackendUrl();
-    savePublishApiUrl(apiUrl);
     var response = await fetch(apiUrl + "/api/publish-project", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -673,9 +668,6 @@
 
   if (publishApiUrlInput) {
     publishApiUrlInput.value = loadPublishApiUrl();
-    publishApiUrlInput.addEventListener("change", function () {
-      savePublishApiUrl(publishApiUrlInput.value.trim() || "http://10.40.92.74:8787");
-    });
   }
 
   window.addEventListener("hashchange", syncRoute);

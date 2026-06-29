@@ -28,10 +28,13 @@
     ul{margin:8px 0 0;padding-left:20px}.muted{color:var(--muted)}
     .diagram{width:100%;overflow:auto;border:1px dashed rgba(201,162,74,.75);border-radius:10px;background:#fff8d8;padding:14px;box-sizing:border-box}
     svg text{font-family:Arial,"Microsoft YaHei",sans-serif}.box{fill:#fffdf3;stroke:#c9a24a;stroke-width:2}.arrow{stroke:#0b6b57;stroke-width:2.6;marker-end:url(#arrow);fill:none}.node{fill:#0b6b57}.warn{fill:#c8587b}.line{stroke:#6c5b37;stroke-width:2;fill:none}.label{font-size:15px;fill:#172033}.small{font-size:12px;fill:#6c5b37}
-    .video-frame{background:#1b241f;border-radius:12px;overflow:hidden;border:2px solid var(--gold)}.video-frame img{display:block;width:100%;height:auto;background:#efe2c4}
+    .media-frame{background:#1b241f;border-radius:12px;overflow:hidden;border:2px solid var(--gold)}.media-frame object{display:block;width:100%;height:min(56vw,620px);background:#efe2c4}
     .table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid rgba(201,162,74,.55);padding:10px;text-align:left;vertical-align:top}.table th{color:var(--green);font-family:var(--display-bold)}
     .stamp{display:inline-block;border:2px solid var(--pink);color:var(--pink);font-family:var(--poster);padding:5px 10px;transform:rotate(-4deg);margin-left:8px}
+    .answer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.answer{border:1px dashed rgba(201,162,74,.75);border-radius:10px;padding:16px;background:#fff8d8}
+    .pipeline{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}.pipeline .diagram{min-height:360px}
     @media(max-width:760px){.grid,.cols{grid-template-columns:1fr}.section{padding:20px}.nav{align-items:flex-start;flex-direction:column}}
+    @media(max-width:900px){.answer-grid,.pipeline{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -45,10 +48,9 @@
     <section class="hero">
       <p class="kicker">Stage 1 Progress Report</p>
       <h1>DeepTag 多面体位姿驱动 Unity</h1>
-      <p class="lead">阶段 1 目标是在一个 360 度旋转均分 8 份、任意 45 度视角都能看到至少一个面的立体结构上贴附 AprilTag / DeepTag，通过多 Tag 融合获得物体 6DoF 位姿，并输出 xyz 平移与旋转给 Unity 驱动虚拟物体。</p>
+      <p class="lead">阶段 1 面向多面体定位载体建立可验证的 6DoF 位姿链路：在 360 度旋转方向上按 45 度间隔布置可观测面，并在各可观测面部署 AprilTag / DeepTag 标记，通过多 Tag 刚体融合估计实体结构的 xyz 平移与三轴旋转，最终向 Unity 输出稳定位姿以驱动对应虚拟物体。</p>
       <div class="actions">
         <a class="btn" href="/assets/projects/apriltag-unity-pose/apriltag-unity-stage1-progress.pptx" download>下载 PPT 进度报告</a>
-        <a class="btn" href="/assets/projects/apriltag-unity-pose/pose-pipeline-demo.svg" target="_blank" rel="noopener">打开视频动画</a>
       </div>
     </section>
 
@@ -59,131 +61,108 @@
     </section>
 
     <section class="section">
-      <h2>进度摘要</h2>
+      <h2>阶段一进度结论</h2>
       <div class="cols">
         <div>
-          <h3>阶段 1 目标</h3>
+          <h3>阶段目标</h3>
           <ul>
-            <li>完成多面体结构与 Tag 贴附方案验证。</li>
-            <li>从单帧灰度图像中检测可见面 Tag，并融合为刚体位姿。</li>
-            <li>将 6DoF 位姿输出给 Unity，使虚拟物体跟随实体结构运动。</li>
-            <li>路线从传统 AprilTag 推进到 DeepTag，提升低光、运动模糊、反光和遮挡下的鲁棒性。</li>
+            <li>建立 8 个方向均匀覆盖的多面体观测结构，保证实体旋转到任意 45 度方向时仍具备可观测 Tag 面。</li>
+            <li>在各可观测面部署 AprilTag / DeepTag，并以多 Tag 刚体约束融合单帧检测结果。</li>
+            <li>输出实体结构的三维平移和三轴旋转，作为 Unity 虚拟物体驱动输入。</li>
+            <li>结构设计参考当前资料目录中的 STL/STP 模型；本报告基于阶段 1 资料重构，不直接挂载原始 PPT 内容。</li>
           </ul>
         </div>
         <div>
           <h3>已完成事项 <span class="stamp">阶段验证</span></h3>
           <ul>
-            <li>已在创维 1600 上完成初步验证，可以进行基础驱动。</li>
-            <li>在未接入创维底层的条件下，通过分时复用方式拿到约 30fps 灰度图像。</li>
-            <li>当前图像帧无法严格对应 IMU 数据，但大致精度与稳定性已经完成测试。</li>
-            <li>偶发卡顿仍存在，主要受取流方式、帧同步和底层接口限制影响。</li>
-            <li>阶段 1 待确认问题已在参考 README 中完成答复，真机、标定、取流和 Tag 选型被列为关键依赖。</li>
+            <li>已在创维 1600 设备上完成初步闭环验证，实体结构位姿可用于 Unity 虚拟物体基础跟随。</li>
+            <li>在尚未接入创维底层接口的条件下，当前通过分时复用方式获取约 30fps 灰度图像流。</li>
+            <li>当前灰度帧尚不能与 IMU 数据严格同步；在该约束下，已完成基础精度、稳定性和可驱动性验证。</li>
+            <li>测试中仍观察到偶发帧间停顿，主要风险来自取流方式、帧时间戳同步和底层接口未开放。</li>
+            <li>检测路线已从传统 AprilTag 推进到 DeepTag，以提升低照度、运动模糊、反光和遮挡场景下的稳定性。</li>
           </ul>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <h2>流程图</h2>
-      <div class="diagram">
-        <svg width="1080" height="250" viewBox="0 0 1080 250" role="img" aria-label="DeepTag 位姿流程图">
-          <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#0b6b57"/></marker></defs>
-          <rect class="box" x="20" y="70" width="150" height="82" rx="10"/><text class="label" x="50" y="105">创维 1600</text><text class="small" x="48" y="130">30fps 灰度帧</text>
-          <rect class="box" x="230" y="70" width="150" height="82" rx="10"/><text class="label" x="260" y="105">DeepTag</text><text class="small" x="252" y="130">检测 + 角点回归</text>
-          <rect class="box" x="440" y="70" width="150" height="82" rx="10"/><text class="label" x="463" y="105">多 Tag 融合</text><text class="small" x="470" y="130">刚体约束</text>
-          <rect class="box" x="650" y="70" width="150" height="82" rx="10"/><text class="label" x="684" y="105">PnP 位姿</text><text class="small" x="672" y="130">重投影精修</text>
-          <rect class="box" x="860" y="70" width="170" height="82" rx="10"/><text class="label" x="910" y="105">Unity</text><text class="small" x="895" y="130">虚拟物体驱动</text>
-          <path class="arrow" d="M172 111h54"/><path class="arrow" d="M382 111h54"/><path class="arrow" d="M592 111h54"/><path class="arrow" d="M802 111h54"/>
-        </svg>
+      <h2>系统链路</h2>
+      <div class="pipeline">
+        <div class="media-frame">
+          <object data="/assets/projects/apriltag-unity-pose/pose-pipeline-demo.svg" type="image/svg+xml" aria-label="DeepTag 位姿链路自动播放动画"></object>
+        </div>
+        <div class="diagram">
+          <svg width="520" height="430" viewBox="0 0 520 430" role="img" aria-label="系统链路、时序、拓扑和风险汇总">
+            <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#0b6b57"/></marker></defs>
+            <rect class="box" x="24" y="42" width="130" height="70" rx="10"/><text class="label" x="50" y="74">创维1600</text><text class="small" x="42" y="96">30fps 灰度帧</text>
+            <rect class="box" x="204" y="42" width="130" height="70" rx="10"/><text class="label" x="235" y="74">DeepTag</text><text class="small" x="222" y="96">检测/角点/ID</text>
+            <rect class="box" x="374" y="42" width="120" height="70" rx="10"/><text class="label" x="408" y="74">Unity</text><text class="small" x="393" y="96">虚拟物体</text>
+            <path class="arrow" d="M156 78h44"/><path class="arrow" d="M336 78h34"/>
+            <rect class="box" x="64" y="168" width="150" height="92" rx="10"/><text class="label" x="95" y="200">多面体结构</text><text class="small" x="86" y="224">8 个 45°方向</text><text class="small" x="85" y="246">每面 Tag 外参</text>
+            <rect class="box" x="304" y="168" width="150" height="92" rx="10"/><text class="label" x="342" y="200">位姿融合</text><text class="small" x="326" y="224">PnP + 重投影</text><text class="small" x="332" y="246">xyz + rotation</text>
+            <path class="arrow" d="M216 214h84"/>
+            <rect class="box" x="64" y="310" width="390" height="72" rx="10"/><text class="label" x="86" y="340">当前约束：分时复用取流、未接底层、IMU 不同步</text><text class="small" x="86" y="364">下一步需补齐取流 API、内参/畸变、外参/坐标系、时间戳和端侧加速。</text>
+          </svg>
+        </div>
       </div>
     </section>
 
     <section class="section">
-      <h2>时序图</h2>
-      <div class="diagram">
-        <svg width="1080" height="380" viewBox="0 0 1080 380" role="img" aria-label="取流到 Unity 的时序图">
-          <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#0b6b57"/></marker></defs>
-          <g><text class="label" x="60" y="42">相机/创维 1600</text><text class="label" x="295" y="42">取流适配层</text><text class="label" x="520" y="42">DeepTag SDK</text><text class="label" x="740" y="42">位姿融合</text><text class="label" x="930" y="42">Unity</text></g>
-          <path class="line" d="M120 60v280M350 60v280M570 60v280M780 60v280M965 60v280"/>
-          <path class="arrow" d="M120 92h230"/><text class="small" x="160" y="84">灰度帧 / 时间戳</text>
-          <path class="arrow" d="M350 132h220"/><text class="small" x="390" y="124">帧缓存 / 预处理</text>
-          <path class="arrow" d="M570 172h210"/><text class="small" x="610" y="164">Tag 候选、角点、ID</text>
-          <path class="arrow" d="M780 212h185"/><text class="small" x="815" y="204">xyz + rotation</text>
-          <path class="arrow" d="M965 252H780"/><text class="small" x="820" y="244">渲染反馈 / 延迟观测</text>
-          <path class="arrow" d="M780 292H570"/><text class="small" x="600" y="284">重投影误差/QC</text>
-          <text class="small" x="92" y="360">当前限制：取流为分时复用，尚未接入底层同步；IMU 与灰度帧不能严格对应。</text>
-        </svg>
+      <h2>最新技术答复整理</h2>
+      <h3>技术路线说明</h3>
+      <p>当前 SDK 的 AprilTag 检测采用深度学习方案，整体路线对标 DeepArUco / DeepArUco++：检测网络首先定位 Tag 候选区域或热力图，角点精修网络进一步完成亚像素角点回归，随后执行 ID 解码与纠错，最后通过 PnP 与非线性重投影精修输出位姿。该路线用于覆盖传统二值化阈值与轮廓检测方案在反光、弱暗光、运动模糊、弯曲贴附和较大比例遮挡下的失效风险。</p>
+      <table class="table">
+        <thead><tr><th>工况</th><th>传统 AprilTag 风险</th><th>当前 DeepTag 路线</th></tr></thead>
+        <tbody>
+          <tr><td>反光 / 弱暗光</td><td>容易漏检</td><td>通过数据增强和学习式检测提升鲁棒性</td></tr>
+          <tr><td>10%~50% 遮挡</td><td>多数场景失效</td><td>角点回归可做补全，保留可检能力</td></tr>
+          <tr><td>运动模糊 / 弯曲贴附</td><td>角点抖动大</td><td>亚像素角点精修提升稳定性</td></tr>
+          <tr><td>端侧实时性</td><td>CPU 即可但鲁棒性有限</td><td>需要 NNAPI/NPU 等端侧加速，已纳入工程化工作</td></tr>
+        </tbody>
+      </table>
+      <div class="answer-grid">
+        <div class="answer">
+          <h3>Q1 真机依赖</h3>
+          <p>阶段 1 的联调、相机标定和性能测试必须在创维真机上完成。算法、插件和 Demo 主体可以先在 PC / 安卓开发机与离线仿真环境中推进，但真机 bring-up、端侧推理帧率和 30 分钟稳定性测试不能由仿真替代。建议至少提供 2 台真机，分别用于常驻开发联调和测试留观。</p>
+        </div>
+        <div class="answer">
+          <h3>Q2 图像与标定接口</h3>
+          <p>需创维侧明确取流 API 或回调方式、分辨率、帧率、像素格式和是否支持零拷贝；同时需提供相机内参、畸变参数、外参 / 坐标系、帧时间戳、曝光/增益读取能力和 IMU 可用性。若只提供标定途径而非标定结果，则阶段 1 需要安排实测标定工作。</p>
+        </div>
+        <div class="answer">
+          <h3>Q3 Tag 选型</h3>
+          <p>Tag 尺寸建议以 22~28mm 为初始实验区间，最终根据真机实测确定；贴附材质需满足抗反光、曲面贴合、耐磨和耐汗要求；数量和组合方式采用多 Tag 冗余分布，并按刚体分组和 ID 段进行管理。</p>
+        </div>
       </div>
     </section>
 
     <section class="section">
-      <h2>视频 / 过程图</h2>
-      <div class="video-frame">
-        <img src="/assets/projects/apriltag-unity-pose/pose-pipeline-demo.svg" alt="位姿流程动画演示">
-      </div>
-      <p class="muted">该动画为重构的流程演示：图像取流后进入 DeepTag 检测，经过多面体刚体约束融合和 PnP 精修，最终驱动 Unity 虚拟物体。</p>
-    </section>
-
-    <section class="section">
-      <h2>拓扑图</h2>
-      <div class="diagram">
-        <svg width="1080" height="360" viewBox="0 0 1080 360" role="img" aria-label="系统拓扑图">
-          <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#0b6b57"/></marker></defs>
-          <rect class="box" x="50" y="70" width="210" height="180" rx="12"/><text class="label" x="95" y="105">实体多面体</text><text class="small" x="80" y="135">8 个 45 度可观测面</text><text class="small" x="80" y="160">每面贴 Tag</text><text class="small" x="80" y="185">STL/STP 结构已具备</text>
-          <rect class="box" x="330" y="40" width="210" height="110" rx="12"/><text class="label" x="372" y="78">创维 1600</text><text class="small" x="365" y="105">灰度图像取流</text>
-          <rect class="box" x="330" y="210" width="210" height="110" rx="12"/><text class="label" x="370" y="248">标定参数</text><text class="small" x="365" y="275">内参/畸变/坐标系</text>
-          <rect class="box" x="610" y="70" width="210" height="180" rx="12"/><text class="label" x="666" y="106">SDK</text><text class="small" x="650" y="136">DeepTag 检测</text><text class="small" x="650" y="164">PnP 位姿估计</text><text class="small" x="650" y="192">鲁棒性/QC</text>
-          <rect class="box" x="890" y="100" width="150" height="120" rx="12"/><text class="label" x="936" y="142">Unity</text><text class="small" x="916" y="170">虚拟物体</text>
-          <path class="arrow" d="M260 160h66"/><path class="arrow" d="M540 95h66"/><path class="arrow" d="M540 265c42 0 45-105 66-105"/><path class="arrow" d="M820 160h66"/>
-        </svg>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>知识图谱</h2>
-      <div class="diagram">
-        <svg width="1080" height="440" viewBox="0 0 1080 440" role="img" aria-label="项目知识图谱">
-          <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#0b6b57"/></marker></defs>
-          <circle class="node" cx="520" cy="210" r="58"/><text x="480" y="205" fill="#fffdf3" font-size="18">阶段 1</text><text x="465" y="230" fill="#fffdf3" font-size="15">6DoF 驱动</text>
-          <g><circle class="warn" cx="180" cy="95" r="46"/><text class="label" x="148" y="100">DeepTag</text><circle class="node" cx="190" cy="330" r="46"/><text class="label" x="154" y="335" fill="#fffdf3">多面体</text><circle class="node" cx="520" cy="70" r="46"/><text class="label" x="490" y="75" fill="#fffdf3">创维1600</text><circle class="node" cx="860" cy="105" r="46"/><text class="label" x="830" y="110" fill="#fffdf3">Unity</text><circle class="warn" cx="850" cy="330" r="46"/><text class="label" x="826" y="335">风险</text></g>
-          <path class="arrow" d="M222 112l246 76"/><path class="arrow" d="M226 313l244-76"/><path class="arrow" d="M520 116v34"/><path class="arrow" d="M566 188l242-70"/><path class="arrow" d="M566 232l240 80"/>
-          <text class="small" x="245" y="120">低光/模糊鲁棒性</text><text class="small" x="235" y="314">45 度可见面</text><text class="small" x="540" y="134">30fps 灰度帧</text><text class="small" x="650" y="138">xyz + rotation</text><text class="small" x="640" y="306">卡顿 / IMU 不同步</text>
-        </svg>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>计划图</h2>
+      <h2>后续计划与验收口径</h2>
       <table class="table">
         <thead><tr><th>阶段</th><th>工作内容</th><th>验收重点</th><th>状态</th></tr></thead>
         <tbody>
           <tr><td>1. 结构与 Tag 方案</td><td>确认 8 方向可见面、Tag 尺寸、贴附材质与 ID 规划。</td><td>任意 45 度方向至少一个 Tag 可见。</td><td>结构与参考材料已具备</td></tr>
           <tr><td>2. DeepTag 检测</td><td>检测网络、角点精修、ID 解码、低光/运动模糊数据增强。</td><td>弱光、反光、遮挡与模糊下稳定输出角点。</td><td>路线已确定，需继续端侧优化</td></tr>
           <tr><td>3. 位姿融合</td><td>多 Tag 刚体融合、PnP、非线性重投影精修、坐标系转换。</td><td>输出稳定 xyz 平移与旋转。</td><td>基础验证完成</td></tr>
-          <tr><td>4. 创维 1600 联调</td><td>接入底层取流、相机标定、帧时间戳和 IMU 同步。</td><td>降低卡顿，提升时序稳定性。</td><td>当前未接底层，存在风险</td></tr>
+          <tr><td>4. 创维 1600 联调</td><td>接入底层取流、相机标定、帧时间戳和 IMU 同步。</td><td>降低帧间停顿，提升时序稳定性。</td><td>当前未接底层，存在风险</td></tr>
           <tr><td>5. Unity Demo 验收</td><td>虚拟物体跟随实体结构运动，输出日志和 QC 指标。</td><td>30 分钟稳定性、帧率、漏检率、位姿误差。</td><td>下一步</td></tr>
         </tbody>
       </table>
-    </section>
-
-    <section class="section">
-      <h2>风险与下一步</h2>
       <div class="cols">
         <div>
-          <h3>当前风险</h3>
+          <h3>验收参考</h3>
           <ul>
-            <li>创维 1600 尚未接入底层取流，分时复用导致偶发卡顿。</li>
-            <li>灰度帧无法严格对应 IMU 数据，运动补偿和时序融合受限。</li>
-            <li>低光和运动模糊已转向 DeepTag，但仍需要真机场景数据覆盖。</li>
+            <li>1 Tag 正对稳定叠加，多 Tag 同时检测和融合。</li>
+            <li>暗光、正常光、强光、运动模糊与 25/50/75% 遮挡覆盖。</li>
+            <li>0.3m 到 3m 距离范围，30 分钟无泄漏、不降帧。</li>
           </ul>
         </div>
         <div>
-          <h3>下一步</h3>
+          <h3>需要继续量化</h3>
           <ul>
-            <li>拿到创维底层取流、相机内参、畸变参数和时间戳接口。</li>
-            <li>对 STL/STP 结构进行 Tag 坐标系标定，固化每个面的外参。</li>
-            <li>完成 DeepTag 端侧推理压缩与实时性测试。</li>
-            <li>建立 Unity 驱动日志，输出延迟、丢帧、重投影误差和位姿抖动指标。</li>
+            <li>位姿角度误差阈值、位置误差阈值。</li>
+            <li>检测帧率下限、漏检率上限、Unity 驱动延迟。</li>
+            <li>正式工程版和简易应急验收版的边界。</li>
           </ul>
         </div>
       </div>

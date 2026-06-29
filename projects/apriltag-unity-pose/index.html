@@ -7,7 +7,7 @@
   <link rel="icon" href="/static/cloned-assets/yannesidibe/favicon-2798b8585809.ico">
   <link rel="stylesheet" href="/static/theme/anya-core.css">
   <style>
-    :root{--paper:#fffdf3;--ink:#172033;--muted:#6c5b37;--green:#0b6b57;--gold:#c9a24a;--pink:#c8587b}
+    :root{--paper:#fffdf3;--ink:#172033;--muted:#6c5b37;--green:#0b6b57;--gold:#c9a24a;--pink:#c8587b;--blue:#245a9b;--amber:#9b6a15;--rose:#9a3d5a}
     body{margin:0;background:#efe2c4;color:var(--ink);font-family:var(--display);line-height:1.65}
     .bg{position:fixed;inset:0;background:radial-gradient(rgba(120,90,40,.08) 1.3px,transparent 1.4px) 0 0/15px 15px,linear-gradient(180deg,#f3e8cd,#e6d6b2);z-index:0}
     .wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:46px 22px 80px}
@@ -25,17 +25,21 @@
     .section{padding:28px;margin:24px 0}.section h2{font-family:var(--poster);text-transform:uppercase;color:var(--green);font-size:34px;margin:0 0 16px}
     .section h3{font-family:var(--display-bold);color:var(--green);margin:20px 0 8px}
     .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .cols>div,.answer{background:linear-gradient(180deg,#fff8d8,#fffdf3);border:1px solid rgba(201,162,74,.65);border-radius:10px;padding:16px}
     ul{margin:8px 0 0;padding-left:20px}.muted{color:var(--muted)}
+    li{margin:6px 0}li::marker{color:var(--pink)}
+    .section p:not(.lead){color:#31405a}.section strong{color:var(--rose);font-family:var(--display-bold);background:rgba(200,88,123,.12);padding:1px 4px;border-radius:4px}
+    .status-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.status-strip span{display:block;border-left:5px solid var(--green);background:#fff8d8;border-radius:8px;padding:10px 12px;color:var(--ink);font-family:var(--display-bold)}.status-strip span:nth-child(2){border-color:var(--blue)}.status-strip span:nth-child(3){border-color:var(--pink)}.status-strip span:nth-child(4){border-color:var(--amber)}
     .diagram{width:100%;overflow:auto;border:1px dashed rgba(201,162,74,.75);border-radius:10px;background:#fff8d8;padding:14px;box-sizing:border-box}
     svg text{font-family:Arial,"Microsoft YaHei",sans-serif}.box{fill:#fffdf3;stroke:#c9a24a;stroke-width:2}.arrow{stroke:#0b6b57;stroke-width:2.6;marker-end:url(#arrow);fill:none}.node{fill:#0b6b57}.warn{fill:#c8587b}.line{stroke:#6c5b37;stroke-width:2;fill:none}.label{font-size:15px;fill:#172033}.small{font-size:12px;fill:#6c5b37}
-    .media-frame{background:#1b241f;border-radius:12px;overflow:hidden;border:2px solid var(--gold);aspect-ratio:16/9}.media-frame object{display:block;width:100%;height:100%;background:#efe2c4}
-    .model-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.model-card{border:1px dashed rgba(201,162,74,.75);border-radius:10px;background:#fff8d8;padding:14px}.model-card canvas{display:block;width:100%;aspect-ratio:1/1;border-radius:8px;background:linear-gradient(180deg,#efe2c4,#fffdf3);border:1px solid rgba(201,162,74,.65)}.model-card h3{margin-top:10px}.model-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.model-links a{font-size:13px;color:var(--green);font-family:var(--display-bold)}
-    .table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid rgba(201,162,74,.55);padding:10px;text-align:left;vertical-align:top}.table th{color:var(--green);font-family:var(--display-bold)}
+    .media-frame{background:#efe2c4;border-radius:12px;overflow:hidden;border:2px solid var(--gold);aspect-ratio:1280/460}.media-frame object{display:block;width:100%;height:100%;background:#efe2c4}
+    .model-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.model-card{border:1px dashed rgba(201,162,74,.75);border-radius:10px;background:#fff8d8;padding:14px}.model-card canvas{display:block;width:100%;aspect-ratio:1/1;border-radius:8px;background:linear-gradient(180deg,#efe2c4,#fffdf3);border:1px solid rgba(201,162,74,.65)}.model-card h3{margin-top:10px}.model-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.model-links a{font-size:13px;color:var(--green);font-family:var(--display-bold)}
+    .table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid rgba(201,162,74,.55);padding:10px;text-align:left;vertical-align:top}.table th{color:var(--green);font-family:var(--display-bold);background:rgba(11,107,87,.08)}.table td:first-child{color:var(--blue);font-family:var(--display-bold)}.table td:last-child{color:var(--rose);font-family:var(--display-bold)}
     .stamp{display:inline-block;border:2px solid var(--pink);color:var(--pink);font-family:var(--poster);padding:5px 10px;transform:rotate(-4deg);margin-left:8px}
-    .answer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.answer{border:1px dashed rgba(201,162,74,.75);border-radius:10px;padding:16px;background:#fff8d8}
-    .pipeline{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);gap:18px;align-items:start}.pipeline .diagram{min-height:360px}
-    @media(max-width:760px){.grid,.cols{grid-template-columns:1fr}.section{padding:20px}.nav{align-items:flex-start;flex-direction:column}}
-    @media(max-width:900px){.answer-grid,.pipeline{grid-template-columns:1fr}}
+    .answer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .pipeline{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}.pipeline .diagram{min-height:0}.pipeline .diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}
+    @media(max-width:760px){.grid,.cols,.model-grid,.status-strip{grid-template-columns:1fr}.section{padding:20px}.nav{align-items:flex-start;flex-direction:column}}
+    @media(max-width:900px){.answer-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -63,6 +67,12 @@
 
     <section class="section">
       <h2>阶段一进度结论</h2>
+      <div class="status-strip" aria-label="阶段一状态摘要">
+        <span>结构：8 个方向覆盖</span>
+        <span>检测：DeepTag 路线确定</span>
+        <span>设备：创维 1600 已闭环</span>
+        <span>输出：6DoF 驱动 Unity</span>
+      </div>
       <div class="cols">
         <div>
           <h3>阶段目标</h3>
@@ -70,7 +80,7 @@
             <li>建立 8 个方向均匀覆盖的多面体观测结构，保证实体旋转到任意 45 度方向时仍具备可观测 Tag 面。</li>
             <li>在各可观测面部署 AprilTag / DeepTag，并以多 Tag 刚体约束融合单帧检测结果。</li>
             <li>输出实体结构的三维平移和三轴旋转，作为 Unity 虚拟物体驱动输入。</li>
-            <li>结构设计已形成 STL/STP 模型文件，页面下方提供三维预览和文件下载。</li>
+            <li>结构设计已形成两代 STL 模型文件，页面下方提供三维预览和文件下载。</li>
           </ul>
         </div>
         <div>
@@ -79,7 +89,7 @@
             <li>已在创维 1600 设备上完成初步闭环验证，实体结构位姿可用于 Unity 虚拟物体基础跟随。</li>
             <li>在尚未接入创维底层接口的条件下，当前通过分时复用方式获取约 30fps 灰度图像流。</li>
             <li>当前灰度帧尚不能与 IMU 数据严格同步；在该约束下，已完成基础精度、稳定性和可驱动性验证。</li>
-            <li>测试中仍观察到偶发帧间停顿，主要风险来自取流方式、帧时间戳同步和底层接口未开放。</li>
+            <li>测试中已记录帧间稳定性约束，主要来自取流方式、帧时间戳同步和底层接口未开放。</li>
             <li>检测路线已从传统 AprilTag 推进到 DeepTag，以提升低照度、运动模糊、反光和遮挡场景下的稳定性。</li>
           </ul>
         </div>
@@ -110,25 +120,19 @@
 
     <section class="section">
       <h2>结构模型预览</h2>
-      <p class="muted">当前结构文件包括二进制 STL、多面倒角 STEP 和柱体 STEP。下方预览用于快速检查结构外形与坐标方向，完整工程文件可下载后在 CAD 工具中复核。</p>
+      <p class="muted">当前页面仅展示两代 STL 结构模型：第一代为 <strong>4.stl</strong>，第二代为 <strong>2.stl</strong>。下方预览用于快速检查结构外形、面分布和旋转观察方向。</p>
       <div class="model-grid">
         <div class="model-card">
-          <canvas data-model="/assets/projects/apriltag-unity-pose/structure.stl" data-type="stl" aria-label="STL 结构模型预览"></canvas>
-          <h3>STL 结构模型</h3>
-          <p class="muted">用于展示当前载体基础外形。</p>
+          <canvas data-model="/assets/projects/apriltag-unity-pose/structure.stl" aria-label="第一代 STL 结构模型预览"></canvas>
+          <h3>第一代 STL（4.stl）</h3>
+          <p class="muted">用于展示第一代载体基础外形和初始面布局。</p>
           <div class="model-links"><a href="/assets/projects/apriltag-unity-pose/structure.stl" download>下载 STL</a></div>
         </div>
         <div class="model-card">
-          <canvas data-model="/assets/projects/apriltag-unity-pose/structure-12face.stp" data-type="step" aria-label="12 面倒角 STEP 模型预览"></canvas>
-          <h3>12 面倒角 STEP</h3>
-          <p class="muted">用于 8 方向可观测面与倒角结构复核。</p>
-          <div class="model-links"><a href="/assets/projects/apriltag-unity-pose/structure-12face.stp" download>下载 STP</a></div>
-        </div>
-        <div class="model-card">
-          <canvas data-model="/assets/projects/apriltag-unity-pose/cylinder.stp" data-type="step" aria-label="柱体 STEP 模型预览"></canvas>
-          <h3>柱体 STEP</h3>
-          <p class="muted">用于对照柱体结构和 Tag 贴附空间。</p>
-          <div class="model-links"><a href="/assets/projects/apriltag-unity-pose/cylinder.stp" download>下载 STP</a></div>
+          <canvas data-model="/assets/projects/apriltag-unity-pose/structure-v2.stl" aria-label="第二代 STL 结构模型预览"></canvas>
+          <h3>第二代 STL（2.stl）</h3>
+          <p class="muted">用于展示第二代结构外形和多面体贴标空间。</p>
+          <div class="model-links"><a href="/assets/projects/apriltag-unity-pose/structure-v2.stl" download>下载 STL</a></div>
         </div>
       </div>
     </section>
@@ -136,7 +140,7 @@
     <section class="section">
       <h2>最新技术答复整理</h2>
       <h3>技术路线说明</h3>
-      <p>当前 SDK 的 AprilTag 检测采用深度学习方案，整体路线对标 DeepArUco / DeepArUco++：检测网络首先定位 Tag 候选区域或热力图，角点精修网络进一步完成亚像素角点回归，随后执行 ID 解码与纠错，最后通过 PnP 与非线性重投影精修输出位姿。该路线用于覆盖传统二值化阈值与轮廓检测方案在反光、弱暗光、运动模糊、弯曲贴附和较大比例遮挡下的失效风险。</p>
+      <p>当前 SDK 的 AprilTag 检测采用 <strong>DeepTag 深度学习检测路线</strong>，整体路线对标 DeepArUco / DeepArUco++：检测网络首先定位 Tag 候选区域或热力图，角点精修网络进一步完成亚像素角点回归，随后执行 ID 解码与纠错，最后通过 PnP 与非线性重投影精修输出位姿。该路线用于覆盖传统二值化阈值与轮廓检测方案在反光、弱暗光、运动模糊、弯曲贴附和较大比例遮挡下的失效风险。</p>
       <table class="table">
         <thead><tr><th>工况</th><th>传统 AprilTag 风险</th><th>当前 DeepTag 路线</th></tr></thead>
         <tbody>
@@ -168,9 +172,9 @@
         <thead><tr><th>阶段</th><th>工作内容</th><th>验收重点</th><th>状态</th></tr></thead>
         <tbody>
           <tr><td>1. 结构与 Tag 方案</td><td>确认 8 方向可见面、Tag 尺寸、贴附材质与 ID 规划。</td><td>任意 45 度方向至少一个 Tag 可见。</td><td>结构与参考材料已具备</td></tr>
-          <tr><td>2. DeepTag 检测</td><td>检测网络、角点精修、ID 解码、低光/运动模糊数据增强。</td><td>弱光、反光、遮挡与模糊下稳定输出角点。</td><td>路线已确定，需继续端侧优化</td></tr>
+          <tr><td>2. DeepTag 检测</td><td>检测网络、角点精修、ID 解码、低光/运动模糊数据增强。</td><td>弱光、反光、遮挡与模糊下稳定输出角点。</td><td>路线已确定，端侧约束已记录</td></tr>
           <tr><td>3. 位姿融合</td><td>多 Tag 刚体融合、PnP、非线性重投影精修、坐标系转换。</td><td>输出稳定 xyz 平移与旋转。</td><td>基础验证完成</td></tr>
-          <tr><td>4. 创维 1600 联调</td><td>当前通过分时复用方式取 30fps 灰度图像，尚未接入底层同步链路。</td><td>降低帧间停顿，提升时序稳定性。</td><td>受底层接口约束</td></tr>
+          <tr><td>4. 创维 1600 联调</td><td>当前通过分时复用方式取 30fps 灰度图像，尚未接入底层同步链路。</td><td>记录取流约束下的时序稳定性表现。</td><td>受底层接口约束</td></tr>
           <tr><td>5. Unity Demo 验证</td><td>虚拟物体已可进行基础跟随，当前用于验证 6DoF 链路可行性。</td><td>稳定性、帧率、漏检率、位姿误差。</td><td>基础闭环已验证</td></tr>
         </tbody>
       </table>
@@ -188,7 +192,7 @@
           <ul>
             <li>创维 1600 初步闭环验证结论。</li>
             <li>DeepTag 技术路线和端侧工程化约束说明。</li>
-            <li>STL/STP 结构文件、网页进度报告和 PPT 进度报告。</li>
+            <li>两代 STL 结构文件、网页进度报告和 PPT 进度报告。</li>
           </ul>
         </div>
       </div>
@@ -207,6 +211,7 @@
         var view = new DataView(buffer);
         var count = view.getUint32(80, true);
         var triangles = [];
+        var stride = Math.max(1, Math.ceil(count / 9000));
         var offset = 84;
         for (var i = 0; i < count; i += 1) {
           offset += 12;
@@ -215,19 +220,10 @@
             tri.push({ x: view.getFloat32(offset, true), y: view.getFloat32(offset + 4, true), z: view.getFloat32(offset + 8, true) });
             offset += 12;
           }
-          triangles.push(tri);
+          if (i % stride === 0) triangles.push(tri);
           offset += 2;
         }
         return { triangles: triangles, points: triangles.flat() };
-      }
-      function parseStep(text) {
-        var points = [];
-        var re = /CARTESIAN_POINT\('[^']*',\(([-0-9.E+]+),([-0-9.E+]+),([-0-9.E+]+)\)\)/g;
-        var match;
-        while ((match = re.exec(text)) && points.length < 2200) {
-          points.push({ x: Number(match[1]), y: Number(match[2]), z: Number(match[3]) });
-        }
-        return { points: points, triangles: [] };
       }
       function normalize(model) {
         var points = model.points;
@@ -250,7 +246,7 @@
         var depth = 2.2 + z;
         return { x: size / 2 + x / depth * size * 1.45, y: size / 2 - y / depth * size * 1.45, z: z };
       }
-      function draw(canvas, model, kind, start) {
+      function draw(canvas, model, start) {
         var ctx = canvas.getContext("2d");
         var ratio = fitCanvas(canvas);
         var size = canvas.width;
@@ -263,7 +259,7 @@
         for (var g = 1; g < 6; g += 1) {
           ctx.beginPath(); ctx.arc(size / 2, size / 2, g * size / 12, 0, Math.PI * 2); ctx.stroke();
         }
-        if (kind === "stl" && model.triangles.length) {
+        if (model.triangles.length) {
           var tris = model.triangles.map(function (tri) {
             var pts = tri.map(function (p) { return project(p, angle, size); });
             return { pts: pts, z: (pts[0].z + pts[1].z + pts[2].z) / 3 };
@@ -278,25 +274,18 @@
             ctx.strokeStyle = "rgba(23,32,51,.45)";
             ctx.fill(); ctx.stroke();
           });
-        } else {
-          var pts = model.points.map(function (p) { return project(p, angle, size); }).sort(function (a, b) { return a.z - b.z; });
-          ctx.fillStyle = "#0b6b57";
-          pts.forEach(function (p, index) {
-            if (index % Math.max(1, Math.floor(pts.length / 700)) !== 0) return;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 2.1 * ratio, 0, Math.PI * 2); ctx.fill();
-          });
         }
         ctx.fillStyle = "#172033";
         ctx.font = Math.floor(13 * ratio) + "px sans-serif";
-        ctx.fillText(kind.toUpperCase() + " preview", 14 * ratio, 24 * ratio);
-        requestAnimationFrame(function () { draw(canvas, model, kind, start); });
+        ctx.fillText("STL preview", 14 * ratio, 24 * ratio);
+        requestAnimationFrame(function () { draw(canvas, model, start); });
       }
       document.querySelectorAll("canvas[data-model]").forEach(function (canvas) {
         fetch(canvas.dataset.model).then(function (response) {
-          return canvas.dataset.type === "stl" ? response.arrayBuffer() : response.text();
+          return response.arrayBuffer();
         }).then(function (data) {
-          var model = canvas.dataset.type === "stl" ? parseBinaryStl(data) : parseStep(data);
-          draw(canvas, normalize(model), canvas.dataset.type, Date.now());
+          var model = parseBinaryStl(data);
+          draw(canvas, normalize(model), Date.now());
         }).catch(function () {
           var ctx = canvas.getContext("2d"); fitCanvas(canvas); ctx.fillText("模型预览加载失败", 20, 40);
         });

@@ -148,6 +148,9 @@
     if (!cards) return;
     var projects = BUILTIN_PROJECTS.concat(loadProjects());
     cards.innerHTML = projects.length ? projects.map(projectCard).join("") : emptyState();
+    cards.querySelectorAll(".ac-reveal").forEach(function (element) {
+      element.classList.add("is-in");
+    });
     if (projectCount) {
       projectCount.textContent = String(projects.length);
       projectCount.setAttribute("data-count", String(projects.length));

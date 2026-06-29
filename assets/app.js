@@ -338,6 +338,20 @@
     return missing;
   }
 
+  function publishErrorMessage(error) {
+    var message = String(error && error.message || error || "");
+    if (message === "Bad credentials") {
+      return "GitHub Token 无效或已过期。请重新创建 Fine-grained personal access token：Repository access 选择 gszsyy.github.io；Contents 权限设置为 Read and write；Metadata 保持 Read-only。复制时不要带空格、引号或换行。";
+    }
+    if (message.indexOf("Resource not accessible by personal access token") >= 0 || message.indexOf("Requires authentication") >= 0) {
+      return "GitHub Token 权限不足。请确认 token 已选择 gszsyy.github.io 仓库，并给 Contents 设置 Read and write 权限。";
+    }
+    if (message.indexOf("Not Found") >= 0) {
+      return "GitHub 仓库或文件未找到。请确认 token 可以访问 gszsyy/gszsyy.github.io，并且仓库已选择到该 token。";
+    }
+    return message || "未知错误";
+  }
+
   function removeLocalProject(id) {
     saveProjects(loadProjects().filter(function (project) {
       return project.id !== id;
@@ -406,7 +420,7 @@
       location.hash = "#cards";
       syncRoute();
     } catch (error) {
-      setPublishStatus("审核发布失败：" + error.message, true);
+      setPublishStatus("审核发布失败：" + publishErrorMessage(error), true);
     } finally {
       if (reviewPublishButton) {
         reviewPublishButton.disabled = false;

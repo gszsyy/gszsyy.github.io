@@ -92,7 +92,7 @@
     @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}.form-row,.detail-grid{grid-template-columns:1fr}}
     @media print{.v2nav,.ac-buddy,.tools,.login-screen{display:none!important}.head{padding-top:36px}.cards{padding-bottom:30px}}
   </style>
-  <script defer src="/assets/app.js?v=20260629-v7-review-publish"></script>
+  <script defer src="/assets/app.js?v=20260629-v8-token-help"></script>
 </head>
 <body class="ac-root">
   <div class="bg" aria-hidden="true"></div>
@@ -187,6 +187,7 @@
           <label>审核发布用 JSON<textarea id="local-project-json" class="review-json" readonly></textarea></label>
           <div class="publish-panel">
             <label>GitHub Token（仅本次发布使用，不保存）<input id="github-token" type="password" autocomplete="off" placeholder="需要 gszsyy.github.io 仓库 Contents 读写权限"></label>
+            <div class="publish-status">Token 要求：Fine-grained personal access token，Repository access 选择 only select repositories，并选择 gszsyy.github.io；Permissions 中 Contents 设置为 Read and write，Metadata 保持 Read-only。复制 token 时不要带空格、引号或换行。</div>
             <div class="form-actions">
               <button id="review-publish-project" class="ac-tab ac-magnetic" data-magnetic="12" type="button">审核发布</button>
             </div>

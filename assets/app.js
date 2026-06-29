@@ -6,6 +6,7 @@
   var AUTH_KEY = "duomianma-sdk-weekly-auth";
   var DRAFT_KEY = "duomianma-sdk-weekly-draft-v1";
   var PROJECTS_KEY = "duomianma-sdk-projects-v1";
+  var PUBLISH_API_KEY = "duomianma-sdk-publish-api-url";
   var PROJECTS_MANIFEST = "/assets/projects.json?v=20260629-published-projects";
   var GITHUB_OWNER = "gszsyy";
   var GITHUB_REPO = "gszsyy.github.io";
@@ -36,6 +37,7 @@
   var entryCount = document.getElementById("entry-count");
   var copyProjectJsonButton = document.getElementById("copy-project-json");
   var reviewPublishButton = document.getElementById("review-publish-project");
+  var publishApiUrlInput = document.getElementById("publish-api-url");
 
   var fields = {
     title: document.getElementById("report-title"),
@@ -119,6 +121,14 @@
 
   function saveProjects(projects) {
     localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+  }
+
+  function loadPublishApiUrl() {
+    return localStorage.getItem(PUBLISH_API_KEY) || "http://127.0.0.1:8787";
+  }
+
+  function savePublishApiUrl(value) {
+    localStorage.setItem(PUBLISH_API_KEY, value);
   }
 
   function setPublishStatus(message, isError) {
@@ -341,13 +351,22 @@
   function publishErrorMessage(error) {
     var message = String(error && error.message || error || "");
     if (message === "Bad credentials") {
-      return "GitHub Token 无效或已过期。请重新创建 Fine-grained personal access token：Repository access 选择 gszsyy.github.io；Contents 权限设置为 Read and write；Metadata 保持 Read-only。复制时不要带空格、引号或换行。";
+      return "本机后端配置的 GITHUB_TOKEN 无效或已过期。请在 server/.env 中重新配置 Fine-grained personal access token：Repository access 选择 gszsyy.github.io；Contents 权限设置为 Read and write；Metadata 保持 Read-only。";
     }
     if (message.indexOf("Resource not accessible by personal access token") >= 0 || message.indexOf("Requires authentication") >= 0) {
-      return "GitHub Token 权限不足。请确认 token 已选择 gszsyy.github.io 仓库，并给 Contents 设置 Read and write 权限。";
+      return "本机后端配置的 GITHUB_TOKEN 权限不足。请确认 token 已选择 gszsyy.github.io 仓库，并给 Contents 设置 Read and write 权限。";
     }
     if (message.indexOf("Not Found") >= 0) {
       return "GitHub 仓库或文件未找到。请确认 token 可以访问 gszsyy/gszsyy.github.io，并且仓库已选择到该 token。";
+    }
+    if (message.indexOf("Failed to fetch") >= 0 || message.indexOf("NetworkError") >= 0 || message.indexOf("Load failed") >= 0) {
+      return "无法连接本机发布后端。请确认 server/publish-server.js 已在你的电脑上运行，发布后端地址正确，例如 http://127.0.0.1:8787。";
+    }
+    if (message.indexOf("发布密码不正确") >= 0) {
+      return "发布密码不正确。请填写本机后端 server/.env 中的 PUBLISH_PASSWORD。";
+    }
+    if (message.indexOf("后端未配置 GITHUB_TOKEN") >= 0) {
+      return "本机后端未配置 GITHUB_TOKEN。请在 server/.env 中配置有 Contents 读写权限的 GitHub Token，并重启后端服务。";
     }
     return message || "未知错误";
   }
@@ -358,10 +377,40 @@
     }));
   }
 
+  function publishBackendUrl() {
+    var value = publishApiUrlInput ? publishApiUrlInput.value.trim() : "";
+    value = value || loadPublishApiUrl();
+    return value.replace(/\/+$/, "");
+  }
+
+  function publishPassword() {
+    var input = document.getElementById("publish-password");
+    return input ? input.value : "";
+  }
+
+  async function publishViaBackend(project) {
+    var apiUrl = publishBackendUrl();
+    savePublishApiUrl(apiUrl);
+    var response = await fetch(apiUrl + "/api/publish-project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        password: publishPassword(),
+        project: project
+      })
+    });
+    var data = await response.json().catch(function () {
+      return {};
+    });
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || ("发布后端 HTTP " + response.status));
+    }
+    return data.project;
+  }
+
   async function publishLocalProject(id) {
     var project = findLocalProject(id);
-    var tokenInput = document.getElementById("github-token");
-    var token = tokenInput ? tokenInput.value.trim() : "";
+    var passwordInput = document.getElementById("publish-password");
     if (!project) {
       setPublishStatus("没有找到本机草稿项目。", true);
       return;
@@ -371,8 +420,8 @@
       setPublishStatus("审核未通过：请补全 " + missing.join("、") + "。", true);
       return;
     }
-    if (!token) {
-      setPublishStatus("请输入 GitHub Token。Token 需要 gszsyy.github.io 仓库 Contents 读写权限。", true);
+    if (!publishPassword()) {
+      setPublishStatus("请输入发布密码。发布密码配置在你电脑本机后端的 server/.env 中。", true);
       return;
     }
     var originalText = reviewPublishButton ? reviewPublishButton.textContent : "";
@@ -381,38 +430,8 @@
       reviewPublishButton.textContent = "正在审核发布";
     }
     try {
-      setPublishStatus("正在创建项目详情页...");
-      var pagePath = "projects/" + project.id + "/index.html";
-      var existingPage = await optionalGithubFile(token, pagePath);
-      await putGithubFile(
-        token,
-        pagePath,
-        projectPageHtml(project),
-        "Publish project page: " + project.name,
-        existingPage && existingPage.sha
-      );
-
-      setPublishStatus("正在更新托管项目清单...");
-      var manifest = await getGithubFile(token, "assets/projects.json");
-      var projects = JSON.parse(base64ToText(manifest.content));
-      var entry = projectManifestEntry(Object.assign({}, project, { url: "/projects/" + project.id + "/" }));
-      var found = false;
-      projects = projects.map(function (item) {
-        if (item.id === entry.id) {
-          found = true;
-          return entry;
-        }
-        return item;
-      });
-      if (!found) projects.unshift(entry);
-      await putGithubFile(
-        token,
-        "assets/projects.json",
-        JSON.stringify(projects, null, 2) + "\n",
-        "Publish project manifest entry: " + project.name,
-        manifest.sha
-      );
-
+      setPublishStatus("正在调用本机发布后端...");
+      await publishViaBackend(project);
       setPublishStatus("发布提交完成。GitHub Pages 构建完成后，其他设备会显示该项目。");
       removeLocalProject(project.id);
       await loadPublishedProjects();
@@ -426,7 +445,7 @@
         reviewPublishButton.disabled = false;
         reviewPublishButton.textContent = originalText || "审核发布";
       }
-      if (tokenInput) tokenInput.value = "";
+      if (passwordInput) passwordInput.value = "";
     }
   }
 
@@ -666,6 +685,13 @@
         return;
       }
       publishLocalProject(location.hash.replace("#local-project-", ""));
+    });
+  }
+
+  if (publishApiUrlInput) {
+    publishApiUrlInput.value = loadPublishApiUrl();
+    publishApiUrlInput.addEventListener("change", function () {
+      savePublishApiUrl(publishApiUrlInput.value.trim() || "http://127.0.0.1:8787");
     });
   }
 

@@ -6,6 +6,16 @@
   var AUTH_KEY = "duomianma-sdk-weekly-auth";
   var DRAFT_KEY = "duomianma-sdk-weekly-draft-v1";
   var PROJECTS_KEY = "duomianma-sdk-projects-v1";
+  var BUILTIN_PROJECTS = [{
+    id: "apriltag-unity-pose",
+    name: "DeepTag 多面体位姿驱动 Unity",
+    owner: "AprilTag（深度学习）SDK 提供方",
+    intro: "阶段 1：在 360 度八等份可见面的立体结构上贴附 AprilTag / DeepTag，融合多面 Tag 得到 6DoF 位姿，并输出给 Unity 驱动虚拟物体。",
+    completeness: 35,
+    entries: 1,
+    updatedAt: "2026-06-29 11:54",
+    url: "/projects/apriltag-unity-pose/"
+  }];
   var scriptLoads = {};
 
   var loginScreen = document.getElementById("login-screen");
@@ -116,8 +126,9 @@
     var score = Math.max(0, Math.min(100, Number(project.completeness) || 0));
     var owner = project.owner || "未填写";
     var intro = project.intro || "暂无简介。";
+    var url = project.url || ("#project-" + project.id);
     return [
-      '<a class="report ac-reveal" data-cursor-label="View" href="#project-' + escapeHtml(project.id) + '" id="project-' + escapeHtml(project.id) + '">',
+      '<a class="report ac-reveal" data-cursor-label="View" href="' + escapeHtml(url) + '" id="project-' + escapeHtml(project.id) + '">',
       '<img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">',
       '<div class="label">EDEN ACADEMY · REPORT CARD</div>',
       '<h3>' + escapeHtml(project.name) + '</h3>',
@@ -135,7 +146,7 @@
 
   function renderProjects() {
     if (!cards) return;
-    var projects = loadProjects();
+    var projects = BUILTIN_PROJECTS.concat(loadProjects());
     cards.innerHTML = projects.length ? projects.map(projectCard).join("") : emptyState();
     if (projectCount) {
       projectCount.textContent = String(projects.length);

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">AprilTag / DeepTag 位姿驱动 Unity 流程动画</title>
+  <desc id="desc">展示相机取流、DeepTag 检测、多面体融合、PnP 位姿估计和 Unity 驱动的重构过程动画。</desc>
+  <defs>
+    <style>
+      .bg{fill:#efe2c4}.panel{fill:#fffdf3;stroke:#c9a24a;stroke-width:3}.line{stroke:#0b6b57;stroke-width:6;fill:none;stroke-linecap:round}.thin{stroke:#6c5b37;stroke-width:3;fill:none}.text{font:700 28px sans-serif;fill:#193327}.small{font:500 19px sans-serif;fill:#5b4a2e}.tag{fill:#101820}.tag2{fill:#fff}.accent{fill:#c8587b}.green{fill:#0b6b57}.gold{fill:#c9a24a}.ghost{opacity:.22}
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#0b6b57"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1280" height="720"/>
+  <text x="70" y="74" class="text">阶段 1 位姿链路重构演示</text>
+  <text x="70" y="108" class="small">360° 八等份可见面 · 每面贴 Tag · DeepTag 鲁棒检测 · 输出 6DoF 给 Unity</text>
+
+  <g transform="translate(70,155)">
+    <rect class="panel" x="0" y="0" width="190" height="210" rx="16"/>
+    <text x="28" y="42" class="text" font-size="22">创维 1600</text>
+    <rect x="48" y="70" width="94" height="70" rx="10" fill="#23262b"/>
+    <circle cx="95" cy="105" r="20" fill="#5f6b78"/>
+    <text x="28" y="174" class="small">30fps 灰度帧</text>
+    <text x="28" y="198" class="small">暂未同步 IMU</text>
+  </g>
+
+  <g transform="translate(345,140)">
+    <rect class="panel" x="0" y="0" width="250" height="240" rx="16"/>
+    <text x="34" y="44" class="text" font-size="22">DeepTag 检测</text>
+    <rect class="tag" x="54" y="75" width="54" height="54"/>
+    <rect class="tag2" x="66" y="87" width="12" height="12"/><rect class="tag2" x="84" y="87" width="12" height="12"/><rect class="tag2" x="66" y="105" width="12" height="12"/>
+    <rect class="tag" x="145" y="82" width="54" height="54" transform="rotate(12 172 109)"/>
+    <path class="accent" d="M52 170c42-30 102-30 147 0" opacity=".75"/>
+    <text x="34" y="205" class="small">低光 / 模糊 / 遮挡增强</text>
+  </g>
+
+  <g transform="translate(670,122)">
+    <rect class="panel" x="0" y="0" width="260" height="276" rx="16"/>
+    <text x="34" y="44" class="text" font-size="22">多面体融合</text>
+    <polygon points="130,72 204,116 204,202 130,246 56,202 56,116" fill="#e9c86f" stroke="#6c5b37" stroke-width="3"/>
+    <polygon points="130,72 204,116 130,160 56,116" fill="#f6dc8e" stroke="#6c5b37" stroke-width="2"/>
+    <polygon points="56,116 130,160 130,246 56,202" fill="#d6a943" stroke="#6c5b37" stroke-width="2"/>
+    <polygon points="204,116 130,160 130,246 204,202" fill="#f0c967" stroke="#6c5b37" stroke-width="2"/>
+    <rect class="tag" x="107" y="113" width="42" height="42" transform="rotate(30 128 134)"/>
+    <text x="34" y="260" class="small">可见面 Tag → 刚体约束</text>
+  </g>
+
+  <g transform="translate(1010,155)">
+    <rect class="panel" x="0" y="0" width="200" height="210" rx="16"/>
+    <text x="42" y="42" class="text" font-size="22">Unity</text>
+    <rect x="62" y="78" width="76" height="76" rx="12" fill="#0b6b57"/>
+    <path d="M82 116h36M100 98v36" stroke="#fffdf3" stroke-width="8" stroke-linecap="round"/>
+    <text x="32" y="184" class="small">虚拟物体驱动</text>
+  </g>
+
+  <path class="line" d="M265 260H330" marker-end="url(#arrow)"/>
+  <path class="line" d="M600 260H655" marker-end="url(#arrow)"/>
+  <path class="line" d="M936 260h58" marker-end="url(#arrow)"/>
+
+  <circle class="accent" r="12">
+    <animateMotion dur="5s" repeatCount="indefinite" path="M260 260H330H600H655H936H994"/>
+  </circle>
+  <g>
+    <path class="thin" d="M798 315c45 38 96 38 142 0"/>
+    <text x="760" y="352" class="small">PnP + 非线性重投影精修</text>
+  </g>
+  <text x="70" y="648" class="small">当前验证：创维 1600 可基本驱动；限制：30fps 灰度帧、分时复用取流、未接底层 IMU 同步，偶发卡顿。</text>
+</svg>

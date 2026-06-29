@@ -26,6 +26,19 @@
     .anya{position:absolute;left:5%;bottom:-30px;width:min(16vw,150px);filter:drop-shadow(0 14px 22px rgba(0,0,0,.3));pointer-events:none}
     .tools{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:24px 0 10px}
     .cards{max-width:1100px;margin:0 auto;padding:24px clamp(16px,4vw,40px) 88px;display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:26px}
+    .report{position:relative;display:block;background:#fffdf3;border:2px solid var(--gold);border-radius:14px;padding:26px 24px 22px;box-shadow:0 14px 32px rgba(90,70,30,.18);overflow:hidden}
+    .report:before{content:"";position:absolute;inset:6px;border:1px dashed rgba(201,162,74,.6);border-radius:9px;pointer-events:none}
+    .report .crest{position:absolute;right:14px;top:14px;width:48px;opacity:.9}
+    .report .label{font-family:var(--poster);color:var(--gold);font-size:12px;letter-spacing:.12em}
+    .report h3{font-family:var(--display-bold);font-size:24px;color:var(--green-deep);margin:4px 0 6px}
+    .report .owner{font-family:var(--hand);color:var(--muted);font-size:13px;margin-bottom:12px}
+    .report .intro{font-size:14px;color:#4a3d2a;min-height:42px;margin:0 0 12px;line-height:1.5}
+    .stella{display:flex;gap:4px;align-items:center;margin:6px 0 4px}
+    .stella img{width:24px}.stella img.off{filter:grayscale(1);opacity:.3}
+    .grade{font-family:var(--poster);color:var(--pink-deep);font-size:30px;line-height:1}
+    .report .foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-family:var(--hand);font-size:13px;color:var(--muted)}
+    .report .seal{position:absolute;right:18px;bottom:14px;transform:rotate(-10deg) scale(.7);opacity:0;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .25s}
+    .report.is-in .seal{opacity:.9;transform:rotate(-10deg) scale(1)}
     .empty{grid-column:1/-1;text-align:center;font-family:var(--hand);color:var(--muted);padding:42px;background:#fffdf3;border:2px solid var(--gold);border-radius:14px;box-shadow:0 14px 32px rgba(90,70,30,.18);position:relative}
     .empty:before{content:"";position:absolute;inset:6px;border:1px dashed rgba(201,162,74,.6);border-radius:9px;pointer-events:none}
     .empty b{display:block;font-family:var(--display-bold);color:var(--green-deep);font-size:24px;margin-bottom:8px}
@@ -96,21 +109,118 @@
         <h1>多面码SDK联合开发专项群</h1>
         <p>每个项目一张成绩单：联合开发进度用 Stella 星点亮，审阅通过盖章放行。</p>
         <div class="tools">
-          <a class="ac-tab ac-magnetic" data-magnetic="12" data-cursor-label="空状态" href="#cards">当前暂无在册项目</a>
+          <a class="ac-tab ac-magnetic" data-magnetic="12" data-cursor-label="新建" href="#cards">+ 新建项目 ★</a>
         </div>
       </section>
 
       <section class="cards" id="cards">
-        <div class="empty">
-          <b>还没有在册项目。</b>
-          GitHub Pages 版内容为空，后续联合开发进度在这里独立维护。
-        </div>
+        <a class="report ac-reveal" data-cursor-label="View" href="#project-3" id="project-3">
+          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+          <div class="label">EDEN ACADEMY · REPORT CARD</div>
+          <h3>Aruco/Apriltag</h3>
+          <div class="owner">负责人 文灏 · 更新 2026-06-25 11:21</div>
+          <p class="intro">创建不同类型的tag并测试识别效果，计算物体在虚拟世界中的旋转和位置。通过检测识别 ArUco 和 AprilTag 计</p>
+          <div class="stella">
+            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <span class="grade">62%</span>
+          </div>
+          <div class="foot"><span>📒 4 份联合开发进度</span><span>AI 评估完成度</span></div>
+        </a>
+
+        <a class="report ac-reveal" data-cursor-label="View" href="#project-7" id="project-7">
+          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+          <div class="label">EDEN ACADEMY · REPORT CARD</div>
+          <h3>runtime</h3>
+          <div class="owner">负责人 王维 (jordan514) · 更新 2026-06-23 13:52</div>
+          <p class="intro">## 项目定位 **Monado Nibiru 运行时逆向重建**:以 **`.so` 二进制证据为唯一准绳**,逆向</p>
+          <div class="stella">
+            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <span class="grade">40%</span>
+          </div>
+          <div class="foot"><span>📒 1 份联合开发进度</span><span>AI 评估完成度</span></div>
+        </a>
+
+        <a class="report ac-reveal" data-cursor-label="View" href="#project-6" id="project-6">
+          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+          <div class="label">EDEN ACADEMY · REPORT CARD</div>
+          <h3>扩展研究</h3>
+          <div class="owner">负责人 wangwei · 更新 2026-06-23 12:14</div>
+          <p class="intro">## 项目定位 扩展研究用于跟踪非主线但可能支撑 XR、视觉感知、健康感知和沉浸式呈现能力的探索方向。本周聚焦两条线：</p>
+          <div class="stella">
+            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <span class="grade">25%</span>
+          </div>
+          <div class="foot"><span>📒 1 份联合开发进度</span><span>AI 评估完成度</span></div>
+        </a>
+
+        <a class="report ac-reveal" data-cursor-label="View" href="#project-2" id="project-2">
+          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+          <div class="label">EDEN ACADEMY · REPORT CARD</div>
+          <h3>光速1600（slam+tag）</h3>
+          <div class="owner">负责人 韩宇 陆宸胄 · 更新 2026-06-22 18:58</div>
+          <p class="intro">完成耀宇样机稀疏点云评估、平面场景转换及AprilTag拟合，实现重定位快速校准，通过rk3588 6DoF验证和大空间</p>
+          <div class="stella">
+            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <span class="grade">38%</span>
+          </div>
+          <div class="foot"><span>📒 3 份联合开发进度</span><span>AI 评估完成度</span></div>
+        </a>
+
+        <a class="report ac-reveal" data-cursor-label="View" href="#project-1" id="project-1">
+          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+          <div class="label">EDEN ACADEMY · REPORT CARD</div>
+          <h3>（灰度摄像头）手部感知追踪模型</h3>
+          <div class="owner">负责人 王威 · 更新 2026-06-16 13:00</div>
+          <p class="intro">面向 MR 头显（四路头戴**单色/灰度鱼眼相机**）的全栈手部追踪系统。针对灰度相机的低照度、快速运动、视角受限等挑战</p>
+          <div class="stella">
+            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <span class="grade">32%</span>
+          </div>
+          <div class="foot"><span>📒 3 份联合开发进度</span><span>AI 评估完成度</span></div>
+        </a>
+
+        <a class="report ac-reveal" data-cursor-label="View" href="#project-5" id="project-5">
+          <img class="crest" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+          <div class="label">EDEN ACADEMY · REPORT CARD</div>
+          <h3>runtime 反编译（Monado Nibiru 运行时逆向重建）</h3>
+          <div class="owner">负责人 wangwei · 更新 2026-06-16 12:12</div>
+          <p class="intro">为 **RK3588 双系统（Android + Linux）AR 设备（代号 2560）** 逆向并重建 **Nibi</p>
+          <div class="stella">
+            <img class="" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <img class="off" src="/static/cloned-assets/spyfamily/star-mini.png" alt="">
+            <span class="grade">25%</span>
+          </div>
+          <div class="foot"><span>📒 1 份联合开发进度</span><span>AI 评估完成度</span></div>
+        </a>
       </section>
 
       <section class="pj-extra">
         <div class="pj-stats">
-          <div class="ac-reveal"><b data-count="0">0</b><span>在册项目</span></div>
-          <div class="ac-reveal"><b data-count="0">0</b><span>累计联合开发进度</span></div>
+          <div class="ac-reveal"><b data-count="6">0</b><span>在册项目</span></div>
+          <div class="ac-reveal"><b data-count="13">0</b><span>累计联合开发进度</span></div>
           <div class="ac-reveal"><b><span class="ac-star"></span> ∞</b><span>Stella 进度</span></div>
         </div>
         <div class="pj-rule">

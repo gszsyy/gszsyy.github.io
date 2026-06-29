@@ -131,14 +131,17 @@
         <div class="project-form-card">
           <h2>新建项目</h2>
           <form id="project-form" class="project-form">
-            <label>项目名称<input id="project-name" type="text" required></label>
+            <p class="owner">简介与目标会作为后续联合开发进度分析、评估整体完成度的依据。支持 Markdown。</p>
             <div class="form-row">
-              <label>负责人<input id="project-owner" type="text"></label>
-              <label>完成度（0-100）<input id="project-completeness" type="number" min="0" max="100" value="0"></label>
+              <label>项目名 <span class="hint">必填</span><input id="project-name" name="name" type="text" required placeholder="如：视觉 SLAM 研究"></label>
+              <label>负责人<input id="project-owner" name="owner" type="text" placeholder="你的名字 / 团队"></label>
             </div>
-            <label>项目简介<textarea id="project-intro"></textarea></label>
+            <label>项目简介（Markdown）<textarea id="project-intro" name="intro" placeholder="这个项目要解决什么问题、背景、范围..."></textarea></label>
+            <label>阶段性目标（Markdown）<span class="hint">分阶段里程碑</span><textarea id="project-phased-goals" name="phased_goals" placeholder="- 阶段1：跑通基础管线&#10;- 阶段2：精度达到 X&#10;- 阶段3：实时化"></textarea></label>
+            <label>最终目标（Markdown）<textarea id="project-final-goals" name="final_goals" placeholder="项目最终要达成的状态 / 交付物"></textarea></label>
+            <label>编辑 PIN <span class="hint">可选。设置后后续编辑项目需要此 PIN。</span><input id="project-edit-pin" name="edit_pin" type="password" autocomplete="new-password" placeholder="可留空"></label>
             <div class="form-actions">
-              <button class="ac-tab ac-magnetic" data-magnetic="12" type="submit">保存项目</button>
+              <button class="ac-tab ac-magnetic" data-magnetic="12" type="submit">创建项目</button>
               <a class="ac-tab ac-magnetic" data-magnetic="12" href="#cards">取消</a>
             </div>
           </form>

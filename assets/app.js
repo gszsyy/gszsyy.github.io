@@ -306,7 +306,9 @@
       var nameInput = document.getElementById("project-name");
       var ownerInput = document.getElementById("project-owner");
       var introInput = document.getElementById("project-intro");
-      var completenessInput = document.getElementById("project-completeness");
+      var phasedGoalsInput = document.getElementById("project-phased-goals");
+      var finalGoalsInput = document.getElementById("project-final-goals");
+      var editPinInput = document.getElementById("project-edit-pin");
       var name = nameInput.value.trim();
       if (!name) return;
       var projects = loadProjects();
@@ -315,13 +317,15 @@
         name: name,
         owner: ownerInput.value.trim(),
         intro: introInput.value.trim(),
-        completeness: Math.max(0, Math.min(100, Number(completenessInput.value) || 0)),
+        phasedGoals: phasedGoalsInput.value.trim(),
+        finalGoals: finalGoalsInput.value.trim(),
+        editPin: editPinInput.value,
+        completeness: 0,
         entries: 0,
         updatedAt: nowLabel()
       });
       saveProjects(projects);
       projectForm.reset();
-      if (completenessInput) completenessInput.value = "0";
       renderProjects();
       location.hash = "#cards";
       syncRoute();

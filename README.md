@@ -2,8 +2,8 @@
 
 这是给 GitHub Pages 托管的独立静态周报页。
 
-- GitHub 仓库：<https://github.com/wchange77/duomianma-sdk-weekly-pages>
-- GitHub Pages：<https://wchange77.github.io/duomianma-sdk-weekly-pages/>
+- GitHub 仓库：<https://github.com/gszsyy/gszsyy.github.io>
+- GitHub Pages：<https://gszsyy.github.io/>
 - 页面标题：多面码SDK联合开发专项群
 - 访问用户名：`gszsyy`
 - 访问密码：`gszsyy1234`

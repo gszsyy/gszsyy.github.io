@@ -66,6 +66,10 @@
     .detail-block:nth-child(2){border-color:var(--pink-deep)}
     .detail-block b{display:block;font-family:var(--display-bold);color:var(--green-deep);margin-bottom:6px}
     .review-json{width:100%;min-height:170px;box-sizing:border-box;border:2px solid rgba(201,162,74,.7);border-radius:8px;background:#fff7bd;color:#172033;padding:12px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
+    .publish-panel{background:#fff8d8;border:2px solid rgba(201,162,74,.75);border-radius:10px;padding:14px;margin:14px 0;display:grid;gap:10px}
+    .publish-panel label{display:grid;gap:7px;font-family:var(--display-bold);color:#3a2d16}
+    .publish-panel input{width:100%;box-sizing:border-box;border:2px solid rgba(201,162,74,.7);border-radius:8px;background:#fff7bd;color:#172033;padding:12px 13px}
+    .publish-status{min-height:22px;color:#8a5a12;font-family:var(--display-bold);line-height:1.55}
     .v2foot{background:#3a2d16;color:rgba(243,232,205,.82);padding:46px clamp(24px,7vw,90px);font-family:var(--hand);border-top:2px dashed var(--gold);position:relative;z-index:2}
     .v2foot b{color:var(--gold);font-family:var(--display-bold)}
     .pj-extra{position:relative;z-index:2;padding:10px 0 90px}
@@ -88,7 +92,7 @@
     @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}.form-row,.detail-grid{grid-template-columns:1fr}}
     @media print{.v2nav,.ac-buddy,.tools,.login-screen{display:none!important}.head{padding-top:36px}.cards{padding-bottom:30px}}
   </style>
-  <script defer src="/assets/app.js?v=20260629-v6-local-detail"></script>
+  <script defer src="/assets/app.js?v=20260629-v7-review-publish"></script>
 </head>
 <body class="ac-root">
   <div class="bg" aria-hidden="true"></div>
@@ -181,9 +185,16 @@
             </div>
           </div>
           <label>审核发布用 JSON<textarea id="local-project-json" class="review-json" readonly></textarea></label>
+          <div class="publish-panel">
+            <label>GitHub Token（仅本次发布使用，不保存）<input id="github-token" type="password" autocomplete="off" placeholder="需要 gszsyy.github.io 仓库 Contents 读写权限"></label>
+            <div class="form-actions">
+              <button id="review-publish-project" class="ac-tab ac-magnetic" data-magnetic="12" type="button">审核发布</button>
+            </div>
+            <div id="publish-status" class="publish-status" role="status"></div>
+          </div>
           <div class="detail-block">
             <b>审核进入托管清单流程</b>
-            <div>1. 检查上方项目简介、阶段性目标和最终目标是否完整、可公开。&#10;2. 复制“审核发布用 JSON”，加入仓库的 assets/projects.json。&#10;3. 如需正式详情页，同时创建 /projects/项目ID/ 页面并把 JSON 中的 url 指向该页面。&#10;4. 提交并发布 GitHub Pages 后，其他设备会从托管清单同步看到该项目卡片。</div>
+            <div>点击“审核发布”后会自动完成：检查内容完整性、创建 /projects/项目ID/ 页面、更新 assets/projects.json、提交到 GitHub Pages 仓库。GitHub Pages 构建完成后，其他设备会从托管清单同步看到该项目卡片。</div>
           </div>
           <div class="form-actions">
             <button id="copy-project-json" class="ac-tab ac-magnetic" data-magnetic="12" type="button">复制审核 JSON</button>

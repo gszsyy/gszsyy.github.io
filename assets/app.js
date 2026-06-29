@@ -7,6 +7,9 @@
   var DRAFT_KEY = "duomianma-sdk-weekly-draft-v1";
   var PROJECTS_KEY = "duomianma-sdk-projects-v1";
   var PROJECTS_MANIFEST = "/assets/projects.json?v=20260629-published-projects";
+  var GITHUB_OWNER = "gszsyy";
+  var GITHUB_REPO = "gszsyy.github.io";
+  var GITHUB_BRANCH = "main";
   var BUILTIN_PROJECTS = [{
     id: "apriltag-unity-pose",
     name: "DeepTag 多面体位姿驱动 Unity",
@@ -32,6 +35,7 @@
   var projectCount = document.getElementById("project-count");
   var entryCount = document.getElementById("entry-count");
   var copyProjectJsonButton = document.getElementById("copy-project-json");
+  var reviewPublishButton = document.getElementById("review-publish-project");
 
   var fields = {
     title: document.getElementById("report-title"),
@@ -115,6 +119,13 @@
 
   function saveProjects(projects) {
     localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+  }
+
+  function setPublishStatus(message, isError) {
+    var status = document.getElementById("publish-status");
+    if (!status) return;
+    status.textContent = message || "";
+    status.style.color = isError ? "#b42318" : "#8a5a12";
   }
 
   function mergeProjects(published, local) {
@@ -239,6 +250,170 @@
       updatedAt: project.updatedAt || nowLabel(),
       url: project.url || ("/projects/" + project.id + "/")
     };
+  }
+
+  function projectPageHtml(project) {
+    return '<!DOCTYPE html>\n' +
+      '<html lang="zh-CN">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+      '<title>' + escapeHtml(project.name) + ' · 项目详情</title>\n' +
+      '<link rel="stylesheet" href="/static/theme/anya-core.css">\n' +
+      '<style>body{margin:0;background:#efe2c4;color:#172033;font-family:var(--display);line-height:1.65}.bg{position:fixed;inset:0;background:radial-gradient(rgba(120,90,40,.08) 1.3px,transparent 1.4px) 0 0/15px 15px,linear-gradient(180deg,#f3e8cd,#e6d6b2)}.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:46px 22px 80px}.nav{display:flex;justify-content:space-between;margin-bottom:32px}.nav a{color:#0b6b57;font-family:var(--display-bold);text-decoration:none}.section{background:#fffdf3;border:2px solid #c9a24a;border-radius:14px;box-shadow:0 14px 32px rgba(90,70,30,.16);padding:28px;margin:24px 0}.kicker{font-family:var(--poster);color:#0b6b57;letter-spacing:.08em;text-transform:uppercase}.title{font-family:var(--display-bold);font-size:clamp(34px,6vw,62px);line-height:1.08;color:#0b6b57;margin:0 0 10px}.meta{color:#6c5b37;font-family:var(--hand)}h2{font-family:var(--poster);color:#0b6b57;font-size:30px;margin:0 0 12px}.block{background:#fff8d8;border-left:5px solid #0b6b57;border-radius:8px;padding:14px;white-space:pre-wrap}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}</style>\n' +
+      '</head>\n<body><div class="bg" aria-hidden="true"></div><main class="wrap"><nav class="nav"><a href="/">返回联合开发进度</a><a href="/projects/new/">新建项目</a></nav>' +
+      '<section class="section"><p class="kicker">Published Project</p><h1 class="title">' + escapeHtml(project.name) + '</h1><p class="meta">负责人 ' + escapeHtml(project.owner || "未填写") + ' · 更新 ' + escapeHtml(project.updatedAt || nowLabel()) + '</p><div class="block">' + escapeHtml(project.intro || "未填写") + '</div></section>' +
+      '<section class="grid"><div class="section"><h2>阶段性目标</h2><div class="block">' + escapeHtml(project.phasedGoals || "未填写") + '</div></div><div class="section"><h2>最终目标</h2><div class="block">' + escapeHtml(project.finalGoals || "未填写") + '</div></div></section>' +
+      '</main></body>\n</html>\n';
+  }
+
+  function bytesToBase64(bytes) {
+    var binary = "";
+    bytes.forEach(function (byte) { binary += String.fromCharCode(byte); });
+    return btoa(binary);
+  }
+
+  function textToBase64(text) {
+    return bytesToBase64(new TextEncoder().encode(text));
+  }
+
+  function base64ToText(value) {
+    var binary = atob(String(value || "").replace(/\s/g, ""));
+    var bytes = new Uint8Array(binary.length);
+    for (var index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+    return new TextDecoder("utf-8").decode(bytes);
+  }
+
+  function githubApi(token, path, options) {
+    return fetch("https://api.github.com/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/contents/" + path, Object.assign({
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "Authorization": "Bearer " + token,
+        "X-GitHub-Api-Version": "2022-11-28"
+      }
+    }, options || {})).then(function (response) {
+      return response.text().then(function (text) {
+        var data = text ? JSON.parse(text) : {};
+        if (!response.ok) {
+          throw new Error((data && data.message) || ("GitHub API " + response.status));
+        }
+        return data;
+      });
+    });
+  }
+
+  function getGithubFile(token, path) {
+    return githubApi(token, path + "?ref=" + encodeURIComponent(GITHUB_BRANCH));
+  }
+
+  function putGithubFile(token, path, content, message, sha) {
+    var body = {
+      message: message,
+      content: textToBase64(content),
+      branch: GITHUB_BRANCH
+    };
+    if (sha) body.sha = sha;
+    return githubApi(token, path, {
+      method: "PUT",
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "Authorization": "Bearer " + token,
+        "X-GitHub-Api-Version": "2022-11-28",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+  }
+
+  function optionalGithubFile(token, path) {
+    return getGithubFile(token, path).catch(function (error) {
+      if (String(error.message || "").indexOf("Not Found") >= 0) return null;
+      throw error;
+    });
+  }
+
+  function validateProjectForPublish(project) {
+    var missing = [];
+    if (!String(project.name || "").trim()) missing.push("项目名");
+    if (!String(project.intro || "").trim()) missing.push("项目简介");
+    if (!String(project.phasedGoals || "").trim()) missing.push("阶段性目标");
+    if (!String(project.finalGoals || "").trim()) missing.push("最终目标");
+    return missing;
+  }
+
+  function removeLocalProject(id) {
+    saveProjects(loadProjects().filter(function (project) {
+      return project.id !== id;
+    }));
+  }
+
+  async function publishLocalProject(id) {
+    var project = findLocalProject(id);
+    var tokenInput = document.getElementById("github-token");
+    var token = tokenInput ? tokenInput.value.trim() : "";
+    if (!project) {
+      setPublishStatus("没有找到本机草稿项目。", true);
+      return;
+    }
+    var missing = validateProjectForPublish(project);
+    if (missing.length) {
+      setPublishStatus("审核未通过：请补全 " + missing.join("、") + "。", true);
+      return;
+    }
+    if (!token) {
+      setPublishStatus("请输入 GitHub Token。Token 需要 gszsyy.github.io 仓库 Contents 读写权限。", true);
+      return;
+    }
+    var originalText = reviewPublishButton ? reviewPublishButton.textContent : "";
+    if (reviewPublishButton) {
+      reviewPublishButton.disabled = true;
+      reviewPublishButton.textContent = "正在审核发布";
+    }
+    try {
+      setPublishStatus("正在创建项目详情页...");
+      var pagePath = "projects/" + project.id + "/index.html";
+      var existingPage = await optionalGithubFile(token, pagePath);
+      await putGithubFile(
+        token,
+        pagePath,
+        projectPageHtml(project),
+        "Publish project page: " + project.name,
+        existingPage && existingPage.sha
+      );
+
+      setPublishStatus("正在更新托管项目清单...");
+      var manifest = await getGithubFile(token, "assets/projects.json");
+      var projects = JSON.parse(base64ToText(manifest.content));
+      var entry = projectManifestEntry(Object.assign({}, project, { url: "/projects/" + project.id + "/" }));
+      var found = false;
+      projects = projects.map(function (item) {
+        if (item.id === entry.id) {
+          found = true;
+          return entry;
+        }
+        return item;
+      });
+      if (!found) projects.unshift(entry);
+      await putGithubFile(
+        token,
+        "assets/projects.json",
+        JSON.stringify(projects, null, 2) + "\n",
+        "Publish project manifest entry: " + project.name,
+        manifest.sha
+      );
+
+      setPublishStatus("发布提交完成。GitHub Pages 构建完成后，其他设备会显示该项目。");
+      removeLocalProject(project.id);
+      await loadPublishedProjects();
+      renderProjects();
+      location.hash = "#cards";
+      syncRoute();
+    } catch (error) {
+      setPublishStatus("审核发布失败：" + error.message, true);
+    } finally {
+      if (reviewPublishButton) {
+        reviewPublishButton.disabled = false;
+        reviewPublishButton.textContent = originalText || "审核发布";
+      }
+      if (tokenInput) tokenInput.value = "";
+    }
   }
 
   function findLocalProject(id) {
@@ -467,6 +642,16 @@
       }
       copyProjectJsonButton.textContent = "已复制审核 JSON";
       setTimeout(function () { copyProjectJsonButton.textContent = "复制审核 JSON"; }, 1400);
+    });
+  }
+
+  if (reviewPublishButton) {
+    reviewPublishButton.addEventListener("click", function () {
+      if (location.hash.indexOf("#local-project-") !== 0) {
+        setPublishStatus("请先打开一个本机草稿项目。", true);
+        return;
+      }
+      publishLocalProject(location.hash.replace("#local-project-", ""));
     });
   }
 

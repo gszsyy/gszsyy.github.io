@@ -1,0 +1,12 @@
+[
+  {
+    "id": "apriltag-unity-pose",
+    "name": "DeepTag 多面体位姿驱动 Unity",
+    "owner": "中数元宇",
+    "intro": "阶段 1：在 360 度八等份可见面的立体结构上贴附 AprilTag / DeepTag，融合多面 Tag 得到 6DoF 位姿，并输出给 Unity 驱动虚拟物体。",
+    "completeness": 35,
+    "entries": 1,
+    "updatedAt": "2026-06-29 11:54",
+    "url": "/projects/apriltag-unity-pose/"
+  }
+]

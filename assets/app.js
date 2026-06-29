@@ -6,16 +6,18 @@
   var AUTH_KEY = "duomianma-sdk-weekly-auth";
   var DRAFT_KEY = "duomianma-sdk-weekly-draft-v1";
   var PROJECTS_KEY = "duomianma-sdk-projects-v1";
+  var PROJECTS_MANIFEST = "/assets/projects.json?v=20260629-published-projects";
   var BUILTIN_PROJECTS = [{
     id: "apriltag-unity-pose",
     name: "DeepTag 多面体位姿驱动 Unity",
-    owner: "AprilTag（深度学习）SDK 提供方",
+    owner: "中数元宇",
     intro: "阶段 1：在 360 度八等份可见面的立体结构上贴附 AprilTag / DeepTag，融合多面 Tag 得到 6DoF 位姿，并输出给 Unity 驱动虚拟物体。",
     completeness: 35,
     entries: 1,
     updatedAt: "2026-06-29 11:54",
     url: "/projects/apriltag-unity-pose/"
   }];
+  var publishedProjects = BUILTIN_PROJECTS.slice();
   var scriptLoads = {};
 
   var loginScreen = document.getElementById("login-screen");
@@ -113,6 +115,33 @@
     localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
   }
 
+  function mergeProjects(published, local) {
+    var seen = {};
+    return published.concat(local).filter(function (project) {
+      var id = project && project.id;
+      if (!id || seen[id]) return false;
+      seen[id] = true;
+      return true;
+    });
+  }
+
+  function loadPublishedProjects() {
+    if (!window.fetch) return Promise.resolve(publishedProjects);
+    return fetch(PROJECTS_MANIFEST, { cache: "no-store" })
+      .then(function (response) {
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        return response.json();
+      })
+      .then(function (projects) {
+        if (Array.isArray(projects) && projects.length) publishedProjects = projects;
+        return publishedProjects;
+      })
+      .catch(function (error) {
+        console.warn("published project manifest failed", error);
+        return publishedProjects;
+      });
+  }
+
   function starMarkup(score) {
     var html = "";
     for (var index = 0; index < 5; index += 1) {
@@ -146,7 +175,7 @@
 
   function renderProjects() {
     if (!cards) return;
-    var projects = BUILTIN_PROJECTS.concat(loadProjects());
+    var projects = mergeProjects(publishedProjects, loadProjects());
     cards.innerHTML = projects.length ? projects.map(projectCard).join("") : emptyState();
     cards.querySelectorAll(".ac-reveal").forEach(function (element) {
       element.classList.add("is-in");
@@ -250,6 +279,7 @@
     loadDraft();
     updatePreview();
     renderProjects();
+    loadPublishedProjects().then(renderProjects);
     syncRoute();
   }
 
@@ -341,6 +371,8 @@
       saveProjects(projects);
       projectForm.reset();
       renderProjects();
+      var notice = document.getElementById("project-publish-notice");
+      if (notice) notice.textContent = "已保存为本机草稿。要让其他设备看到，需要审核后发布到托管项目清单。";
       location.hash = "#cards";
       syncRoute();
     });

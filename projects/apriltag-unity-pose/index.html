@@ -37,9 +37,11 @@
     .table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid rgba(201,162,74,.55);padding:10px;text-align:left;vertical-align:top}.table th{color:var(--green);font-family:var(--display-bold);background:rgba(11,107,87,.08)}.table td:first-child{color:var(--blue);font-family:var(--display-bold)}.table td:last-child{color:var(--rose);font-family:var(--display-bold)}
     .stamp{display:inline-block;border:2px solid var(--pink);color:var(--pink);font-family:var(--poster);padding:5px 10px;transform:rotate(-4deg);margin-left:8px}
     .answer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .qa-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.qa-flow div{background:#fff8d8;border:1px solid rgba(201,162,74,.75);border-left:5px solid var(--green);border-radius:10px;padding:14px}.qa-flow b{display:block;color:var(--green);font-family:var(--display-bold);margin-bottom:6px}.qa-flow span{color:#31405a;font-size:14px}
+    .qa-card{background:linear-gradient(180deg,#fff8d8,#fffdf3);border:1px solid rgba(201,162,74,.75);border-radius:12px;padding:18px;margin:18px 0}.qa-card h3{display:flex;align-items:center;gap:10px;margin-top:0}.qa-tag{display:inline-flex;align-items:center;border-radius:999px;background:rgba(36,90,155,.12);color:var(--blue);padding:3px 10px;font-size:13px;font-family:var(--display-bold)}.qa-role{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.qa-role div{border-left:5px solid var(--pink);background:#fffdf3;border-radius:8px;padding:12px}.qa-role div:first-child{border-color:var(--blue)}.qa-note{border-left:5px solid var(--amber);background:#fff8d8;border-radius:8px;padding:12px;color:#31405a;margin-top:12px}.inline-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:12px 0}.inline-list div{background:#fffdf3;border:1px dashed rgba(201,162,74,.75);border-radius:8px;padding:12px}.inline-list b{display:block;color:var(--rose);font-family:var(--display-bold);margin-bottom:4px}
     .pipeline{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}.pipeline .diagram{min-height:0}.pipeline .diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}
-    @media(max-width:760px){.grid,.cols,.model-grid,.status-strip{grid-template-columns:1fr}.section{padding:20px}.nav{align-items:flex-start;flex-direction:column}}
-    @media(max-width:900px){.answer-grid{grid-template-columns:1fr}}
+    @media(max-width:760px){.grid,.cols,.model-grid,.status-strip,.qa-flow,.qa-role,.inline-list{grid-template-columns:1fr}.section{padding:20px}.nav{align-items:flex-start;flex-direction:column}}
+    @media(max-width:900px){.answer-grid,.qa-flow{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -142,29 +144,72 @@
     <section class="section">
       <h2>最新技术答复整理</h2>
       <h3>技术路线说明</h3>
-      <p>当前 SDK 的 AprilTag 检测采用 <strong>DeepTag 深度学习检测路线</strong>，整体路线对标 DeepArUco / DeepArUco++：检测网络首先定位 Tag 候选区域或热力图，角点精修网络进一步完成亚像素角点回归，随后执行 ID 解码与纠错，最后通过 PnP 与非线性重投影精修输出位姿。该路线用于覆盖传统二值化阈值与轮廓检测方案在反光、弱暗光、运动模糊、弯曲贴附和较大比例遮挡下的失效风险。</p>
+      <p>回答方为 <strong>中数元宇</strong>。当前 SDK 的 AprilTag 检测采用 <strong>自研 DeepApriltag 深度学习方案</strong>，不同于传统二值化阈值 + 轮廓检测路线；检测与解码由神经网络完成 Tag 定位、角点亚像素回归和 ID 解码，再通过 PnP 与非线性重投影精修输出位姿。该路线面向游戏人物和击剑交互中的运动模糊、极端角度、快速尺度变化、强弱光切换、反光和较大比例遮挡等工况。</p>
+      <div class="qa-flow" aria-label="DeepApriltag 技术流程">
+        <div><b>1. 检测网络</b><span>定位画面中 Tag 候选区域或热力图。</span></div>
+        <div><b>2. 角点精修网络</b><span>完成亚像素角点回归，增强抗模糊和抗反光能力。</span></div>
+        <div><b>3. ID 解码</b><span>完成编码识别与纠错，输出稳定 Tag ID。</span></div>
+        <div><b>4. 位姿优化</b><span>通过 PnP + 非线性重投影精修输出位姿。</span></div>
+      </div>
       <table class="table">
         <thead><tr><th>工况</th><th>传统 AprilTag 风险</th><th>当前 DeepTag 路线</th></tr></thead>
         <tbody>
           <tr><td>反光 / 弱暗光</td><td>容易漏检</td><td>通过数据增强和学习式检测提升鲁棒性</td></tr>
           <tr><td>10%~50% 遮挡</td><td>多数场景失效</td><td>角点回归可做补全，保留可检能力</td></tr>
           <tr><td>运动模糊 / 弯曲贴附</td><td>角点抖动大</td><td>亚像素角点精修提升稳定性</td></tr>
-          <tr><td>端侧实时性</td><td>CPU 即可但鲁棒性有限</td><td>需要 NNAPI/NPU 等端侧加速，已纳入工程化工作</td></tr>
+          <tr><td>端侧实时性</td><td>CPU 即可但鲁棒性有限</td><td>需要 NNAPI / NPU-RK3588 等端侧加速，已纳入工程化</td></tr>
         </tbody>
       </table>
-      <div class="answer-grid">
-        <div class="answer">
-          <h3>Q1 真机依赖</h3>
-          <p>阶段 1 的联调、相机标定和性能测试必须在创维真机上完成。算法、插件和 Demo 主体可以先在 PC / 安卓开发机与离线仿真环境中推进，但真机 bring-up、端侧推理帧率和 30 分钟稳定性测试不能由仿真替代。建议至少提供 2 台真机，分别用于常驻开发联调和测试留观。</p>
+      <p class="qa-note">该路线带来数据集、训练、模型压缩部署和位姿精修等额外工作量，但这是游戏人物运动模糊、极端角度和快速尺度变化场景下提升识别稳定性的必要投入。</p>
+
+      <div class="qa-card">
+        <h3>Q1 创维眼镜真机依赖 <span class="qa-tag">硬依赖</span></h3>
+        <p>阶段 1 的联调、相机标定、性能测试最终需要在创维眼镜真机上完成。中数元宇认可该项为硬依赖：相机标定、真机性能调优、端侧推理帧率达标、30 分钟稳定性测试必须在创维眼镜真机上完成。</p>
+        <div class="inline-list">
+          <div><b>中数元宇提供</b>创维眼镜固件版本、SXR_SDK、相应修改的高通 SDK，以及调用灰度摄像头、读取相关摄像头数据和完成坐标转换的方法。</div>
+          <div><b>建议配置</b>至少提供 2 台真机；同时提供一个游戏 Demo，并暴露驱动击剑物体的 API，便于中数元宇调试。</div>
         </div>
-        <div class="answer">
-          <h3>Q2 图像与标定接口</h3>
-          <p>需创维侧明确取流 API 或回调方式、分辨率、帧率、像素格式和是否支持零拷贝；同时需提供相机内参、畸变参数、外参 / 坐标系、帧时间戳、曝光/增益读取能力和 IMU 可用性。若只提供标定途径而非标定结果，则阶段 1 需要安排实测标定工作。</p>
+        <div class="qa-role">
+          <div><b>光速侧</b><p>明确 Demo 形式和 API 文档，提供可驱动击剑物体的接口。</p></div>
+          <div><b>中数元宇侧</b><p>提供固件、SXR_SDK、高通 SDK 和相关文档。</p></div>
         </div>
-        <div class="answer">
-          <h3>Q3 Tag 选型</h3>
-          <p>Tag 尺寸建议以 22~28mm 为初始实验区间，最终根据真机实测确定；贴附材质需满足抗反光、曲面贴合、耐磨和耐汗要求；数量和组合方式采用多 Tag 冗余分布，并按刚体分组和 ID 段进行管理。</p>
-        </div>
+        <p class="qa-note">启动节点以中数元宇提供创维眼镜固件版本、SXR_SDK、修改后的高通 SDK，以及光速提供 Demo API 为准。</p>
+      </div>
+
+      <div class="qa-card">
+        <h3>Q2 头显图像数据对接 <span class="qa-tag">关键输入</span></h3>
+        <p>头显图像数据是算法精度与实时性的关键输入。中数侧提供相机内参、畸变参数、原始帧获取方式等，相关内容随上述 SDK 和文档一并提供。</p>
+        <table class="table">
+          <thead><tr><th>需对接项</th><th>具体要求</th></tr></thead>
+          <tbody>
+            <tr><td>原始帧获取</td><td>取流 API / 回调方式、分辨率、帧率、像素格式（YUV / NV21 / RGB）、是否支持零拷贝。</td></tr>
+            <tr><td>相机内参</td><td>焦距 fx / fy、主点 cx / cy、出厂标定结果或现场标定途径。</td></tr>
+            <tr><td>畸变参数</td><td>畸变模型（径向 / 切向 k1、k2、p1、p2、k3 或鱼眼）及对应系数。</td></tr>
+            <tr><td>外参 / 坐标系</td><td>相机相对头显 / 显示坐标系的外参，时间戳与单位定义。</td></tr>
+            <tr><td>同步信息</td><td>帧时间戳、曝光 / 增益是否可读，IMU 是否可用以支持运动补偿。</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="qa-card">
+        <h3>Q3 Tag 选型 <span class="qa-tag">实测决策</span></h3>
+        <p>Tag 选型围绕尺寸、材质、数量和组合方式展开，目标是在剑体 / 护具等击剑场景部件上保持多角度可检。中数元宇将以选型报告 + 实测方式给出结论，并提供备用码型与图纸；最终选型以真机实测为准。</p>
+        <table class="table">
+          <thead><tr><th>维度</th><th>初步建议</th></tr></thead>
+          <tbody>
+            <tr><td>Tag 尺寸</td><td>参考 20~40mm；近距小尺寸、远距大尺寸，可多尺寸混用。最终通过光照、运动、尺度变化、距离等条件交叉验证后选取表现最好的尺寸。</td></tr>
+            <tr><td>Tag 材质</td><td>参考标定板材质方案，需抗反光、漫反射、可贴合、耐磨耐汗。</td></tr>
+            <tr><td>Tag 数量</td><td>剑体多枚、护具多枚冗余分布，保证任意视角至少 1~2 个 Tag 可见；具体数量通过实测确定。</td></tr>
+            <tr><td>组合方式</td><td>多 Tag 按刚体分组、ID 段分配，区分剑体和护具，便于多 Tag 融合位姿。</td></tr>
+          </tbody>
+        </table>
+        <p class="qa-note">光速侧需提供剑体与护具的可粘贴区域尺寸和方式，并确认是否允许多尺寸 / 冗余布点。深度学习模型将针对最终选定码型与材质做适配训练。</p>
+      </div>
+
+      <div class="qa-card">
+        <h3>需求文档与验收场景 <span class="qa-tag">验收口径</span></h3>
+        <p>阶段 1 验收参考标准包括：1 Tag 正对稳定叠加、遮挡 25% / 50% 可检、多 Tag 同时检测、暗光 / 正常光 / 强光、0.3m 到 3m 距离范围，以及 30 分钟无泄漏不降帧。新版 README 明确指出 75% 遮挡过高，当前不建议作为标准验收项，因为可能显著降低识别率。</p>
+        <p class="qa-note">验收专项游戏 / 场景需要在需求文档中明确。目前场景倾向为击剑，但仍需最终确定；中数元宇将据此准备 Demo 与同步态调试 API。</p>
       </div>
     </section>
 
@@ -185,7 +230,7 @@
           <h3>验收参考</h3>
           <ul>
             <li>1 Tag 正对稳定叠加，多 Tag 同时检测和融合。</li>
-            <li>暗光、正常光、强光、运动模糊与 25/50/75% 遮挡覆盖。</li>
+            <li>暗光、正常光、强光、运动模糊与 25/50% 遮挡覆盖；75% 遮挡当前不建议作为标准验收项。</li>
             <li>0.3m 到 3m 距离范围，30 分钟无泄漏、不降帧。</li>
           </ul>
         </div>

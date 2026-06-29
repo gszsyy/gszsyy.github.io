@@ -6,12 +6,9 @@
   var AUTH_KEY = "duomianma-sdk-weekly-auth";
   var DRAFT_KEY = "duomianma-sdk-weekly-draft-v1";
   var PROJECTS_KEY = "duomianma-sdk-projects-v1";
-  var DEFAULT_PUBLISH_API_URL = "http://10.40.92.74:8787";
-  var AUTO_PUBLISH_PREFIX = "#auto-publish=";
   var PROJECTS_MANIFEST = "/assets/projects.json?v=20260629-published-projects";
   var GITHUB_OWNER = "gszsyy";
   var GITHUB_REPO = "gszsyy.github.io";
-  var GITHUB_BRANCH = "main";
   var BUILTIN_PROJECTS = [{
     id: "apriltag-unity-pose",
     name: "DeepTag 多面体位姿驱动 Unity",
@@ -38,7 +35,6 @@
   var entryCount = document.getElementById("entry-count");
   var copyProjectJsonButton = document.getElementById("copy-project-json");
   var reviewPublishButton = document.getElementById("review-publish-project");
-  var publishApiUrlInput = document.getElementById("publish-api-url");
 
   var fields = {
     title: document.getElementById("report-title"),
@@ -122,36 +118,6 @@
 
   function saveProjects(projects) {
     localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
-  }
-
-  function saveOrReplaceLocalProject(project) {
-    var projects = loadProjects().filter(function (item) {
-      return item.id !== project.id;
-    });
-    projects.unshift(project);
-    saveProjects(projects);
-  }
-
-  function loadPublishApiUrl() {
-    return DEFAULT_PUBLISH_API_URL;
-  }
-
-  function isLocalPublishPage() {
-    return window.location.origin === DEFAULT_PUBLISH_API_URL;
-  }
-
-  function localPublishUrlFor(project) {
-    return DEFAULT_PUBLISH_API_URL + "/" + AUTO_PUBLISH_PREFIX + encodeURIComponent(JSON.stringify(project));
-  }
-
-  function autoPublishProjectFromHash() {
-    if (location.hash.indexOf(AUTO_PUBLISH_PREFIX) !== 0) return null;
-    try {
-      return JSON.parse(decodeURIComponent(location.hash.slice(AUTO_PUBLISH_PREFIX.length)));
-    } catch (error) {
-      console.warn("auto publish payload failed", error);
-      return null;
-    }
   }
 
   function setPublishStatus(message, isError) {
@@ -285,83 +251,6 @@
     };
   }
 
-  function projectPageHtml(project) {
-    return '<!DOCTYPE html>\n' +
-      '<html lang="zh-CN">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
-      '<title>' + escapeHtml(project.name) + ' · 项目详情</title>\n' +
-      '<link rel="stylesheet" href="/static/theme/anya-core.css">\n' +
-      '<style>body{margin:0;background:#efe2c4;color:#172033;font-family:var(--display);line-height:1.65}.bg{position:fixed;inset:0;background:radial-gradient(rgba(120,90,40,.08) 1.3px,transparent 1.4px) 0 0/15px 15px,linear-gradient(180deg,#f3e8cd,#e6d6b2)}.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:46px 22px 80px}.nav{display:flex;justify-content:space-between;margin-bottom:32px}.nav a{color:#0b6b57;font-family:var(--display-bold);text-decoration:none}.section{background:#fffdf3;border:2px solid #c9a24a;border-radius:14px;box-shadow:0 14px 32px rgba(90,70,30,.16);padding:28px;margin:24px 0}.kicker{font-family:var(--poster);color:#0b6b57;letter-spacing:.08em;text-transform:uppercase}.title{font-family:var(--display-bold);font-size:clamp(34px,6vw,62px);line-height:1.08;color:#0b6b57;margin:0 0 10px}.meta{color:#6c5b37;font-family:var(--hand)}h2{font-family:var(--poster);color:#0b6b57;font-size:30px;margin:0 0 12px}.block{background:#fff8d8;border-left:5px solid #0b6b57;border-radius:8px;padding:14px;white-space:pre-wrap}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}</style>\n' +
-      '</head>\n<body><div class="bg" aria-hidden="true"></div><main class="wrap"><nav class="nav"><a href="/">返回联合开发进度</a><a href="/projects/new/">新建项目</a></nav>' +
-      '<section class="section"><p class="kicker">Published Project</p><h1 class="title">' + escapeHtml(project.name) + '</h1><p class="meta">负责人 ' + escapeHtml(project.owner || "未填写") + ' · 更新 ' + escapeHtml(project.updatedAt || nowLabel()) + '</p><div class="block">' + escapeHtml(project.intro || "未填写") + '</div></section>' +
-      '<section class="grid"><div class="section"><h2>阶段性目标</h2><div class="block">' + escapeHtml(project.phasedGoals || "未填写") + '</div></div><div class="section"><h2>最终目标</h2><div class="block">' + escapeHtml(project.finalGoals || "未填写") + '</div></div></section>' +
-      '</main></body>\n</html>\n';
-  }
-
-  function bytesToBase64(bytes) {
-    var binary = "";
-    bytes.forEach(function (byte) { binary += String.fromCharCode(byte); });
-    return btoa(binary);
-  }
-
-  function textToBase64(text) {
-    return bytesToBase64(new TextEncoder().encode(text));
-  }
-
-  function base64ToText(value) {
-    var binary = atob(String(value || "").replace(/\s/g, ""));
-    var bytes = new Uint8Array(binary.length);
-    for (var index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-    return new TextDecoder("utf-8").decode(bytes);
-  }
-
-  function githubApi(token, path, options) {
-    return fetch("https://api.github.com/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/contents/" + path, Object.assign({
-      headers: {
-        "Accept": "application/vnd.github+json",
-        "Authorization": "Bearer " + token,
-        "X-GitHub-Api-Version": "2022-11-28"
-      }
-    }, options || {})).then(function (response) {
-      return response.text().then(function (text) {
-        var data = text ? JSON.parse(text) : {};
-        if (!response.ok) {
-          throw new Error((data && data.message) || ("GitHub API " + response.status));
-        }
-        return data;
-      });
-    });
-  }
-
-  function getGithubFile(token, path) {
-    return githubApi(token, path + "?ref=" + encodeURIComponent(GITHUB_BRANCH));
-  }
-
-  function putGithubFile(token, path, content, message, sha) {
-    var body = {
-      message: message,
-      content: textToBase64(content),
-      branch: GITHUB_BRANCH
-    };
-    if (sha) body.sha = sha;
-    return githubApi(token, path, {
-      method: "PUT",
-      headers: {
-        "Accept": "application/vnd.github+json",
-        "Authorization": "Bearer " + token,
-        "X-GitHub-Api-Version": "2022-11-28",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    });
-  }
-
-  function optionalGithubFile(token, path) {
-    return getGithubFile(token, path).catch(function (error) {
-      if (String(error.message || "").indexOf("Not Found") >= 0) return null;
-      throw error;
-    });
-  }
-
   function validateProjectForPublish(project) {
     var missing = [];
     if (!String(project.name || "").trim()) missing.push("项目名");
@@ -371,96 +260,42 @@
     return missing;
   }
 
-  function publishErrorMessage(error) {
-    var message = String(error && error.message || error || "");
-    if (message === "Bad credentials") {
-      return "发布服务授权已失效。请联系管理员更新发布授权。";
-    }
-    if (message.indexOf("Resource not accessible by personal access token") >= 0 || message.indexOf("Requires authentication") >= 0) {
-      return "发布服务权限不足。请联系管理员检查发布授权。";
-    }
-    if (message.indexOf("Not Found") >= 0) {
-      return "发布目标未找到。请联系管理员检查发布配置。";
-    }
-    if (message.indexOf("Failed to fetch") >= 0 || message.indexOf("NetworkError") >= 0 || message.indexOf("Load failed") >= 0) {
-      return "发布服务暂时不可用。请联系管理员确认发布服务正在运行。";
-    }
-    if (message.indexOf("后端未配置 GITHUB_TOKEN") >= 0) {
-      return "发布服务尚未完成授权配置。请联系管理员处理。";
-    }
-    return message || "未知错误";
+  function githubIssueUrlFor(project) {
+    var payload = JSON.stringify(Object.assign({}, project, projectManifestEntry(project), {
+      phasedGoals: project.phasedGoals || "",
+      finalGoals: project.finalGoals || ""
+    }), null, 2);
+    var body = [
+      "请确认以下项目可以进入托管清单。提交后 GitHub Actions 会自动生成项目详情页并部署。",
+      "",
+      "```json",
+      payload,
+      "```"
+    ].join("\n");
+    var params = new URLSearchParams({
+      title: "[publish-project] " + (project.name || project.id || "未命名项目"),
+      body: body
+    });
+    return "https://github.com/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/issues/new?" + params.toString();
   }
 
-  function removeLocalProject(id) {
-    saveProjects(loadProjects().filter(function (project) {
-      return project.id !== id;
-    }));
-  }
-
-  function publishBackendUrl() {
-    var value = publishApiUrlInput ? publishApiUrlInput.value.trim() : "";
-    value = value || loadPublishApiUrl();
-    return value.replace(/\/+$/, "");
-  }
-
-  async function publishProjectDraft(project, removeAfterPublish) {
+  function publishProjectDraft(project) {
     var missing = validateProjectForPublish(project);
     if (missing.length) {
       setPublishStatus("审核未通过：请补全 " + missing.join("、") + "。", true);
       return;
     }
-    if (!isLocalPublishPage()) {
-      setPublishStatus("正在切换到本机发布服务并继续发布...");
-      window.location.href = localPublishUrlFor(project);
-      return;
-    }
-    var originalText = reviewPublishButton ? reviewPublishButton.textContent : "";
-    if (reviewPublishButton) {
-      reviewPublishButton.disabled = true;
-      reviewPublishButton.textContent = "正在审核发布";
-    }
-    try {
-      setPublishStatus("正在审核并发布...");
-      await publishViaBackend(project);
-      setPublishStatus("发布提交完成。GitHub Pages 构建完成后，其他设备会显示该项目。");
-      if (removeAfterPublish) removeLocalProject(project.id);
-      await loadPublishedProjects();
-      renderProjects();
-      location.hash = "#cards";
-      syncRoute();
-    } catch (error) {
-      setPublishStatus("审核发布失败：" + publishErrorMessage(error), true);
-    } finally {
-      if (reviewPublishButton) {
-        reviewPublishButton.disabled = false;
-        reviewPublishButton.textContent = originalText || "审核发布";
-      }
-    }
+    setPublishStatus("正在打开 GitHub 审核发布单...");
+    window.location.href = githubIssueUrlFor(project);
   }
 
-  async function publishViaBackend(project) {
-    var apiUrl = publishBackendUrl();
-    var response = await fetch(apiUrl + "/api/publish-project", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ project: project })
-    });
-    var data = await response.json().catch(function () {
-      return {};
-    });
-    if (!response.ok || !data.ok) {
-      throw new Error(data.error || ("发布后端 HTTP " + response.status));
-    }
-    return data.project;
-  }
-
-  async function publishLocalProject(id) {
+  function publishLocalProject(id) {
     var project = findLocalProject(id);
     if (!project) {
       setPublishStatus("没有找到本机草稿项目。", true);
       return;
     }
-    await publishProjectDraft(project, true);
+    publishProjectDraft(project);
   }
 
   function findLocalProject(id) {
@@ -702,22 +537,7 @@
     });
   }
 
-  if (publishApiUrlInput) {
-    publishApiUrlInput.value = loadPublishApiUrl();
-  }
-
   window.addEventListener("hashchange", syncRoute);
-
-  function handleAutoPublishRoute() {
-    var project = autoPublishProjectFromHash();
-    if (!project) return false;
-    sessionStorage.setItem(AUTH_KEY, "1");
-    saveOrReplaceLocalProject(project);
-    showApp();
-    showLocalProjectDetail(project.id);
-    publishProjectDraft(project, true);
-    return true;
-  }
 
   var downloadPdfButton = document.getElementById("download-pdf");
   if (downloadPdfButton) downloadPdfButton.addEventListener("click", async function () {
@@ -760,10 +580,6 @@
 
     window.print();
   });
-
-  if (handleAutoPublishRoute()) {
-    return;
-  }
 
   if (sessionStorage.getItem(AUTH_KEY) === "1") {
     showApp();

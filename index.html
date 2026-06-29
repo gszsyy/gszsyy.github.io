@@ -92,7 +92,7 @@
     @media (max-width:600px){.v2nav a.l,.v2nav button.l{display:none}.anya{display:none}.pj-stats{grid-template-columns:1fr}.form-row,.detail-grid{grid-template-columns:1fr}}
     @media print{.v2nav,.ac-buddy,.tools,.login-screen{display:none!important}.head{padding-top:36px}.cards{padding-bottom:30px}}
   </style>
-  <script defer src="/assets/app.js?v=20260629-v13-auto-publish-handoff"></script>
+  <script defer src="/assets/app.js?v=20260629-v14-github-issue-publish"></script>
 </head>
 <body class="ac-root">
   <div class="bg" aria-hidden="true"></div>
@@ -186,7 +186,7 @@
           </div>
           <label>审核发布用 JSON<textarea id="local-project-json" class="review-json" readonly></textarea></label>
           <div class="publish-panel">
-            <div class="publish-status">发布服务已连接。点击审核发布后会自动检查内容、生成项目页面并同步到线上。</div>
+            <div class="publish-status">点击审核发布后会打开 GitHub 官方审核发布单；提交后由 GitHub Actions 自动生成项目页面并部署。</div>
             <div class="form-actions">
               <button id="review-publish-project" class="ac-tab ac-magnetic" data-magnetic="12" type="button">审核发布</button>
             </div>
@@ -194,7 +194,7 @@
           </div>
           <div class="detail-block">
             <b>审核进入托管清单流程</b>
-            <div>点击“审核发布”后会自动完成内容检查、项目页面生成、项目清单更新和线上发布。发布完成后，其他设备刷新页面即可看到项目卡片。</div>
+            <div>点击“审核发布”后会打开 GitHub 审核发布单。确认提交后，GitHub Actions 会自动完成内容检查、项目页面生成、项目清单更新和线上部署。</div>
           </div>
           <div class="form-actions">
             <button id="copy-project-json" class="ac-tab ac-magnetic" data-magnetic="12" type="button">复制审核 JSON</button>
